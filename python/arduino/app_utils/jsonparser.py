@@ -1,0 +1,27 @@
+# SPDX-FileCopyrightText: Copyright (C) Arduino s.r.l. and/or its affiliated companies
+#
+# SPDX-License-Identifier: MPL-2.0
+
+import json
+from .logger import Logger
+
+logger = Logger("JSONParser")
+
+
+class JSONParser:
+    def __init__(self, silent: bool = False):
+        self.silent = silent
+
+    def parse(self, item: str) -> dict:
+        try:
+            return json.loads(item)
+        except Exception as e:
+            if not self.silent:
+                logger.error(f"Error parsing content: {e}")
+            return None
+
+    def process(self, item):
+        if isinstance(item, str):
+            return self.parse(item)
+
+        return item  # No processing needed

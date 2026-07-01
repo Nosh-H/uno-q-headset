@@ -1,0 +1,20 @@
+id: arduino:llm
+name: Large Language Model (LLM)
+description: "Large Language Model (LLM) Brick enables seamless integration with locally hosted LLMs for advanced AI capabilities in your Arduino projects."
+requires_services:
+  - id: arduino:genie
+    when:
+      model: "genie:*"
+  - id: arduino:llamacpp
+    when:
+      model: "llamacpp:*"
+requires_model: true
+model_by_boards:
+    - platform: ventunoq
+      model: genie:qwen3_4b_instruct_2507
+    - platform: unoq
+      model: llamacpp:Qwen3.5-0.8B-Q4_0
+supported_boards: ["unoq", "ventunoq"]
+ai_frameworks_compatibility:
+  - genie
+  - llamacpp

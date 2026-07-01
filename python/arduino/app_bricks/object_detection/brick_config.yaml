@@ -1,0 +1,30 @@
+id: arduino:object_detection
+name: Object Detection
+description: |
+  Brick for object detection using a pre-trained model. It processes images and returns the predicted class label, bounding-boxes and confidence score.
+  Brick is designed to work with pre-trained models provided by framework or with custom object detection models trained on Edge Impulse platform. 
+category: video
+requires_container: true
+requires_model: true
+ai_frameworks_compatibility:
+  - edgeimpulse
+model_by_boards:
+    - board: ventunoq
+      model_name: yolox-qnn-object-detection
+    - board: unoq
+      model_name: yolox-object-detection
+model_configuration_variables:
+  - EI_OBJ_DETECTION_MODEL
+variables:
+- name: EI_OBJ_DETECTION_MODEL
+  description: Path to the model file
+  hidden: true
+  default_value: /models/ootb/ei/yolo-x-nano.eim
+- name: CUSTOM_MODEL_PATH
+  description: Path to the custom model directory
+  hidden: true
+  default_value: /home/arduino/.arduino-bricks/ei-models
+- name: BIND_ADDRESS
+  description: Bind address
+  hidden: true
+  default_value: 127.0.0.1

@@ -1,0 +1,32 @@
+# SPDX-FileCopyrightText: Copyright (C) Arduino s.r.l. and/or its affiliated companies
+#
+# SPDX-License-Identifier: MPL-2.0
+
+from arduino.app_utils import brick
+import time
+
+from python.arduino.app_utils import App, Logger
+
+logger = Logger("ColorDetectorServer")
+
+
+@brick
+class Greeter:
+    def __init__(self, name="World"):
+        self.name = name
+
+    def start(self):
+        logger.info("Starting Greeter")
+
+    def stop(self):
+        logger.info("Stopping Greeter")
+
+    # This is a non-blocking method that will be called repeatedly
+    def loop(self):
+        logger.info(f"Hello, {self.name}!")
+        time.sleep(1)
+
+
+Greeter(input("Enter your name: "))
+
+App.run()

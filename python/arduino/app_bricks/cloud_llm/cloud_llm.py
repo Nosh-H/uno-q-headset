@@ -1,0 +1,503 @@
+# SPDX-FileCopyrightText: Copyright (C) Arduino s.r.l. and/or its affiliated companies
+#
+# SPDX-License-Identifier: MPL-2.0
+
+import asyncio
+import base64
+import os
+import threading
+from typing import Iterator, List, Optional, Union, Any, Callable
+
+from langchain_core.language_models import BaseChatModel
+from langchain_core.messages import BaseMessage, HumanMessage, ToolMessage, AIMessage, ToolCall
+
+from arduino.app_utils import brick
+
+from .utils import logger
+from .models import CloudModel, CloudModelProvider
+from .memory import MessagePersistence, SQLMessagePersistence, WindowedChatMessageHistory
+
+DEFAULT_MEMORY = 10
+
+
+class AlreadyGenerating(Exception):
+    """Exception raised when a generation is already in progress."""
+
+    pass
+
+
+@brick
+class CloudLLM:
+    """A Brick for interacting with cloud-based Large Language Models (LLMs).
+
+    This class wraps LangChain functionality to provide a simplified, unified interface
+    for chatting with models like Claude, GPT, and Gemini. It supports both synchronous
+    'one-shot' responses and streaming output, with optional conversational memory.
+    """
+
+    _logger = logger
+
+    def __init__(
+        self,
+        api_key: str = os.getenv("API_KEY", ""),
+        model: Union[str, CloudModel] = CloudModel.ANTHROPIC_CLAUDE,
+        system_prompt: str = "",
+        temperature: Optional[float] = 0.7,
+        max_tool_loops: int = 8,
+        timeout: Optional[int] = None,
+        tools: List[Callable[..., Any]] = None,
+        callbacks: Any = None,
+        **kwargs,
+    ):
+        """Initializes the CloudLLM brick with the specified provider and configuration.
+
+        Args:
+            api_key (str): The API access key for the target LLM service. Defaults to the
+                'API_KEY' environment variable.
+            model (Union[str, CloudModel]): The model identifier. Accepts a `CloudModel`
+                enum member (e.g., `CloudModel.OPENAI_GPT`) or its corresponding raw string
+                value (e.g., `'openai:gpt-5-mini'`). Defaults to `CloudModel.ANTHROPIC_CLAUDE`.
+                To identify the model provider, you need to use prefixes like 'openai:', 'anthropic:', or 'google:'.
+                If no prefix is provided, the model will be defaulted to an OpenAI compatible model.
+            system_prompt (str): A system-level instruction that defines the AI's persona
+                and constraints (e.g., "You are a helpful assistant"). Defaults to empty.
+            temperature (Optional[float]): The sampling temperature between 0.0 and 1.0.
+                Higher values make output more random/creative; lower values make it more
+                deterministic. Defaults to 0.7.
+            max_tool_loops (int): The maximum number of consecutive tool-call loops
+                allowed during a single chat interaction. Defaults to 8.
+            timeout (Optional[int]): The maximum duration in seconds to wait for a response before
+                timing out. Defaults to None.
+            callbacks (Any): Optional callbacks for monitoring generation events.
+            tools (List[Callable[..., Any]]): A list of callable tool functions to register. Defaults to None.
+            **kwargs: Additional arguments passed to the model constructor
+
+        Raises:
+            ValueError: If `api_key` is not provided (empty string).
+        """
+        if api_key == "" and (
+            model.startswith(f"{CloudModelProvider.OPENAI}:")
+            or model.startswith(f"{CloudModelProvider.ANTHROPIC}:")
+            or model.startswith(f"{CloudModelProvider.GOOGLE}:")
+        ):
+            raise ValueError("API key is required to initialize CloudLLM brick.")
+
+        self._api_key = api_key
+
+        # Model configuration
+        self._system_prompt = system_prompt
+        self._temperature = temperature
+        self._max_tool_loops = max_tool_loops
+        self._timeout = timeout
+        self._callbacks = callbacks
+        self._model_loaded = False
+        self._model_name = model
+
+        # Registered tools
+        self._tools_map = {}
+        if tools is None:
+            self._tools = []
+        else:
+            self._tools = tools
+            for tool_func in tools:
+                self._tools_map[tool_func.name] = tool_func
+
+        # LangChain components
+        self._model = model_factory(
+            model,
+            api_key=self._api_key,
+            temperature=self._temperature,
+            timeout=self._timeout,
+            **kwargs,
+        )
+
+        if self._tools and len(self._tools) > 0:
+            logger.info(f"Binding {len(self._tools)} tool(s) to the model.")
+            self._model = self._model.bind_tools(tools=self._tools)
+
+        # Memory management
+        self.with_memory(DEFAULT_MEMORY)
+
+        self._keep_streaming = threading.Event()
+
+    def with_memory(
+        self,
+        max_messages: int = DEFAULT_MEMORY,
+        persistence: Union[bool, MessagePersistence, None] = None,
+    ) -> "CloudLLM":
+        """Enables conversational memory for this instance.
+
+        Configures the Brick to retain a window of previous messages, allowing the
+        AI to maintain context across multiple interactions. An optional persistence
+        backend stores the history so it can resume across restarts.
+
+        Args:
+            max_messages (int): The maximum number of messages.
+            persistence (bool | MessagePersistence | None): Optional persistence backend.
+                `None` or `False` keep history in memory only (default behavior).
+                `True` instantiates a default `SQLMessagePersistence()`. Pass a
+                `MessagePersistence` implementation directly (e.g.
+                `SQLMessagePersistence(thread_id="user-42")`) for full control.
+
+        Returns:
+            CloudLLM: The current instance, allowing for method chaining.
+        """
+        if persistence is True:
+            store: Optional[MessagePersistence] = SQLMessagePersistence()
+        elif persistence in (False, None):
+            store = None
+        else:
+            store = persistence
+
+        self._max_messages = max_messages
+        self._history = WindowedChatMessageHistory(
+            k=max_messages,
+            system_message=self._system_prompt,
+            store=store,
+        )
+
+        return self
+
+    def _get_message_with_history(self, user_input: str, images: List[str | bytes] = None) -> List[BaseMessage]:
+        """Retrieves the current message history for the conversation, including the new user input.
+
+        Args:
+            user_input (str): The latest input message from the user.
+            images (List[str | bytes]): Optional list of image file paths or raw bytes to include in the prompt.
+
+        Returns:
+            List[BaseMessage]: The list of messages in the conversation history,
+                including system prompt if set.
+        """
+
+        if self._model_loaded is False:
+            logger.info(f"Initializing model {self._model_name}...")
+            self._model_loaded = True
+
+        messages = self._history.get_messages()
+        message = None
+        if images is not None and len(images) > 0:
+            content = []
+            content.append({"type": "text", "text": user_input})
+            for img in images:
+                image_b64 = self._image_to_base64(img)
+                content.append({"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{image_b64}"}})
+
+            message = HumanMessage(content=content)
+        else:
+            message = HumanMessage(content=user_input)
+
+        if message is not None:
+            messages.append(message)
+            self._history.add_messages([message])
+
+        return messages
+
+    def _process_tool_calls(self, tool_calls: list[ToolCall], input_messages: List[BaseMessage]) -> List[BaseMessage]:
+        """Processes any tool calls requested by the model in its response.
+
+        Args:
+            tool_calls (list[ToolCall]): The list of tool calls requested by the model.
+            input_messages (List[BaseMessage]): The current message scope including history.
+
+        Returns:
+            List[BaseMessage]: Updated message scope after processing tool calls.
+        """
+
+        if len(tool_calls) == 0:
+            return input_messages
+
+        for tool_call in tool_calls:
+            logger.debug(f"Calling tool: {tool_call['name']} with args: {tool_call['args']} with id: {tool_call['id']}")
+            tool_name = tool_call["name"]
+            tool_args = tool_call["args"]
+            tool_id = tool_call["id"]
+
+            if tool_name in self._tools_map:
+                logger.debug(f"Invoking tool function for: {tool_name}")
+                tool_func = self._tools_map[tool_name]
+                tool_output = asyncio.run(
+                    tool_func.ainvoke(
+                        tool_args,
+                        config={"callbacks": self._callbacks},
+                    )
+                )
+                logger.debug(f"Tool '{tool_name}' returned: {tool_output}")
+
+                # Append tool output message to current message scope
+                input_messages.append(
+                    ToolMessage(
+                        tool_call_id=tool_id,
+                        content=tool_output,
+                    )
+                )
+
+        # Return updated message scope for further processing
+        return input_messages
+
+    def _image_to_base64(self, path: str | bytes) -> str:
+        """Encodes an image file to a base64 string.
+        Args:
+            path (str | bytes): The file path to the image or raw bytes of the image
+        Returns:
+            str: The base64-encoded string of the image.
+        Raises:
+            FileNotFoundError: If the provided file path does not exist.
+        """
+        if isinstance(path, bytes):
+            return base64.b64encode(path).decode()
+        else:
+            if not os.path.isfile(path):
+                raise FileNotFoundError(f"Image file not found: {path}")
+            with open(path, "rb") as f:
+                return base64.b64encode(f.read()).decode()
+
+    def _content_to_text(self, content: Any) -> str:
+        if isinstance(content, str):
+            return content
+
+        if isinstance(content, list):
+            parts: list[str] = []
+            for p in content:
+                if isinstance(p, dict) and p.get("type") == "text":
+                    parts.append(p.get("text", ""))
+                elif isinstance(p, str):
+                    parts.append(p)
+            return "".join(parts)
+
+        return str(content)
+
+    def get_client(self) -> BaseChatModel:
+        """Returns the underlying LangChain model instance.
+
+        This allows for advanced users to access the full capabilities of the model
+        directly, such as calling `generate()` or `stream()` with custom message formats.
+
+        Returns:
+            BaseChatModel: The LangChain chat model instance used internally.
+        """
+        return self._model
+
+    def chat(self, message: str, images: List[str | bytes] = None) -> str:
+        """Sends a message to the AI and blocks until the complete response is received.
+
+        This method automatically manages conversation history if memory is enabled.
+
+        Args:
+            message (str): The input text prompt from the user.
+            images (List[str | bytes]): Optional list of image file paths or raw bytes to include in the prompt.
+
+        Returns:
+            str: The complete text response generated by the AI.
+
+        Raises:
+            RuntimeError: If the internal chain is not initialized or if the API request fails.
+        """
+        if self._model is None:
+            raise RuntimeError("Model has not been declared properly. Please check the model configuration.")
+
+        try:
+            return self._chat_invoke(message, images)
+        except Exception as e:
+            logger.error(f"Response generation failed: {e}")
+            raise RuntimeError(f"Response generation failed: {e}")
+
+    def _chat_invoke(self, message: str, images: List[str | bytes] = None) -> str:
+        """Internal method to perform the chat invocation with the model.
+
+        This is separated from `chat()` to allow for better error handling and potential reuse
+        in other contexts (e.g., within tool calls).
+
+        Args:
+            message (str): The input text prompt from the user.
+            images (List[str | bytes]): Optional list of image file paths or raw bytes to include in the prompt.
+
+        Returns:
+            str: The complete text response generated by the AI.
+
+        Raises:
+            RuntimeError: If the internal chain is not initialized or if the API request fails.
+        """
+        input_messages = self._get_message_with_history(message, images)
+        loops = 0
+
+        while True:
+            message = self._model.invoke(input=input_messages, config={"callbacks": self._callbacks})
+            if message is None:
+                raise RuntimeError("Received empty response from the LLM.")
+
+            logger.debug(f"Model invoked. Full response: {message}")
+
+            tool_calls = getattr(message, "tool_calls", None) or []
+            if not tool_calls:
+                break
+
+            loops += 1
+            if loops > self._max_tool_loops:
+                raise RuntimeError(f"Too many consecutive tool-call loops ({self._max_tool_loops}). Possible tool loop.")
+
+            input_messages.append(message)
+            input_messages = self._process_tool_calls(tool_calls, input_messages.copy())
+
+        # Add the AI message to long term history
+        self._history.add_messages([message])
+        return self._content_to_text(message.content)
+
+    def chat_stream(self, message: str, images: List[str | bytes] = None) -> Iterator[str]:
+        """Sends a message to the AI and yields response tokens as they are generated.
+
+        This allows for processing or displaying the response in real-time (streaming).
+        The generation can be interrupted by calling `stop_stream()`.
+
+        Args:
+            message (str): The input text prompt from the user.
+            images (List[str | bytes]): Optional list of image file paths or raw bytes to include in the prompt.
+
+        Yields:
+            str: Chunks of text (tokens) from the AI response.
+
+        Raises:
+            RuntimeError: If the internal chain is not initialized or if the API request fails.
+            AlreadyGenerating: If a streaming session is already active.
+        """
+        try:
+            yield from self._chat_stream_invoke(message, images)
+
+        except AlreadyGenerating:
+            raise
+        except Exception as e:
+            self._handle_stream_error(e)
+
+    def _handle_stream_error(self, e: Exception) -> None:
+        """Handles stream errors and acts as an override hook for subclasses.
+
+        Args:
+            e (Exception): The exception that occurred during streaming.
+        """
+        self._logger.error(f"Response generation failed: {e}")
+        raise RuntimeError(f"Response generation failed: {e}") from e
+
+    def _chat_stream_invoke(self, message: str, images: List[str | bytes] = None) -> Iterator[str]:
+        """Internal method to perform the chat streaming invocation with the model.
+
+        This is separated from `chat_stream()` to allow for better error handling and potential reuse
+        in other contexts (e.g., within tool calls).
+
+        Args:
+            message (str): The input text prompt from the user.
+            images (List[str | bytes]): Optional list of image file paths or raw bytes to include in the prompt.
+
+        Yields:
+            str: Chunks of text (tokens) from the AI response.
+
+        Raises:
+            RuntimeError: If the internal chain is not initialized or if the API request fails.
+            AlreadyGenerating: If a streaming session is already active.
+        """
+        if self._model is None:
+            raise RuntimeError("Model has not been declared properly. Please check the model configuration.")
+        if self._keep_streaming.is_set():
+            raise AlreadyGenerating("A streaming response is already in progress. Please stop it before starting a new one.")
+        assistant_chunks: list[str] = []
+
+        try:
+            self._keep_streaming.set()
+            input_messages = self._get_message_with_history(message, images)
+
+            tool_calls = []
+            for token in self._model.stream(input_messages):
+                if not self._keep_streaming.is_set():
+                    break  # This stops the iteration and halts further token generation
+                if token.tool_calls and len(token.tool_calls) > 0:
+                    tool_calls.extend(token.tool_calls)
+                else:
+                    if token.content and len(token.content) > 0:
+                        assistant_chunks.append(token.content)
+                        yield token.content
+
+            # If there were tool calls, process them
+            if len(tool_calls) > 0:
+                input_messages = self._process_tool_calls(tool_calls, input_messages.copy())
+                for token in self._model.stream(input=input_messages, config={"callbacks": self._callbacks}):
+                    if not self._keep_streaming.is_set():
+                        break
+                    if token.content and len(token.content) > 0:
+                        assistant_chunks.append(token.content)
+                        yield token.content
+
+        finally:
+            self._keep_streaming.clear()
+            if len(assistant_chunks) > 0:
+                full_response = "".join(assistant_chunks)
+                self._history.add_messages([AIMessage(content=full_response)])
+
+    def stop_stream(self) -> None:
+        """Signals the active streaming generation to stop.
+
+        This sets an internal flag that causes the `chat_stream` iterator to break
+        early. It has no effect if no stream is currently running.
+        """
+        self._keep_streaming.clear()
+
+    def clear_memory(self) -> None:
+        """Clears the conversational memory history.
+
+        Resets the stored context. This is useful for starting a new conversation
+        topic without previous context interfering. Only applies if memory is enabled.
+        """
+        if self._history:
+            self._history.clear()
+
+
+def model_factory(model_name: CloudModel, **kwargs) -> BaseChatModel:
+    """Factory function to instantiate the specific LangChain chat model.
+
+    This function maps the supported `CloudModel` enum values to their respective
+    LangChain implementations. In case of prefix-based model identifiers (e.g., 'openai:gpt-5-mini'),
+    it extracts the provider and model name accordingly.
+
+    Args:
+        model_name (CloudModel): The enum or string identifier for the model.
+            Model name can include provider prefixes like 'openai:', 'anthropic:', or 'google:'
+            to specify the provider. If no prefix is provided, the model will be defaulted to an OpenAI compatible model.
+        **kwargs: Additional arguments passed to the model constructor (e.g., api_key, temperature).
+
+    Returns:
+        BaseChatModel: An instance of a LangChain chat model wrapper.
+
+    Raises:
+        ValueError: If `model_name` does not match one of the supported options.
+    """
+
+    if (
+        "base_url" in kwargs
+        and not model_name.startswith(f"{CloudModelProvider.OPENAI}:")
+        and not model_name.startswith(f"{CloudModelProvider.ANTHROPIC}:")
+        and not model_name.startswith(f"{CloudModelProvider.GOOGLE}:")
+    ):
+        logger.debug(f"Model name '{model_name}' does not specify a provider prefix, but 'base_url' is provided. Defaulting to OpenAI provider.")
+        model_name = f"{CloudModelProvider.OPENAI}:{model_name}"
+
+    if model_name == CloudModel.ANTHROPIC_CLAUDE or model_name.startswith(f"{CloudModelProvider.ANTHROPIC}:"):
+        from langchain_anthropic import ChatAnthropic
+
+        if model_name.startswith(f"{CloudModelProvider.ANTHROPIC}:"):
+            model_name = model_name.split(":", 1)[1]
+
+        return ChatAnthropic(model=model_name, **kwargs)
+    elif model_name == CloudModel.OPENAI_GPT or model_name.startswith(f"{CloudModelProvider.OPENAI}:"):
+        from langchain_openai import ChatOpenAI
+
+        if model_name.startswith(f"{CloudModelProvider.OPENAI}:"):
+            model_name = model_name.split(":", 1)[1]
+
+        return ChatOpenAI(model=model_name, **kwargs)
+    elif model_name == CloudModel.GOOGLE_GEMINI or model_name.startswith(f"{CloudModelProvider.GOOGLE}:"):
+        from langchain_google_genai import ChatGoogleGenerativeAI
+
+        if model_name.startswith(f"{CloudModelProvider.GOOGLE}:"):
+            model_name = model_name.split(":", 1)[1]
+
+        return ChatGoogleGenerativeAI(model=model_name, **kwargs)
+    else:
+        raise ValueError(f"Model not supported: {model_name}")

@@ -1,0 +1,34 @@
+id: arduino:video_image_classification
+name: Video Image Classification
+description: |
+  This image classification brick utilizes a pre-trained model to analyze video streams from a camera.
+  It identifies objects, returning their predicted class labels and confidence scores.
+  The output is a video stream featuring classification as overaly, with the added capability to trigger actions based on these detections.
+  It supports pre-trained models provided by the framework and custom object detection models trained on the Edge Impulse platform.
+category: video
+requires_model: true
+requires_container: true
+ai_frameworks_compatibility:
+  - edgeimpulse
+required_devices:
+  - camera
+model: mobilenet-image-classification
+model_configuration_variables:
+  - EI_V_CLASSIFICATION_MODEL
+variables:
+- name: EI_V_CLASSIFICATION_MODEL
+  description: Path to the model file
+  hidden: true
+  default_value: /models/ootb/ei/mobilenet-v2-224px.eim
+- name: CUSTOM_MODEL_PATH
+  description: Path to the custom model directory
+  hidden: true
+  default_value: /home/arduino/.arduino-bricks/ei-models
+- name: BIND_ADDRESS
+  description: Bind address
+  hidden: true
+  default_value: 0.0.0.0
+- name: VIDEO_DEVICE
+  description: Video device path
+  hidden: true
+  default_value: /dev/video1

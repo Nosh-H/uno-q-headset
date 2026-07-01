@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Uno Q Headset - Control</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <script defer src="/static/app.js"></script>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <p class="eyebrow">Uno Q Headset</p>
+      <h1>Local control for the headset prototype</h1>
+      <p class="lede">
+        This interface talks to the Python controller, which forwards commands to the Arduino Uno Q firmware.
+      </p>
+    </section>
+
+    <section class="panel controls">
+      <div class="control-group">
+        <h2>LED</h2>
+        <div class="button-row">
+          <button type="button" data-action="led" data-on="true">LED On</button>
+          <button type="button" data-action="led" data-on="false">LED Off</button>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <h2>Mode</h2>
+        <div class="button-row">
+          <button type="button" data-action="mode" data-mode="0">Mode 0</button>
+          <button type="button" data-action="mode" data-mode="1">Mode 1</button>
+          <button type="button" data-action="mode" data-mode="2">Mode 2</button>
+          <button type="button" data-action="mode" data-mode="3">Mode 3</button>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <h2>Arms</h2>
+        <div class="button-row">
+          <button type="button" data-action="state" data-side="0" data-state="true">Left Down</button>
+          <button type="button" data-action="state" data-side="0" data-state="false">Left Up</button>
+          <button type="button" data-action="state" data-side="1" data-state="true">Right Down</button>
+          <button type="button" data-action="state" data-side="1" data-state="false">Right Up</button>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <h2>Safety</h2>
+        <div class="button-row">
+          <button type="button" class="danger" data-action="stop">Emergency Stop</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel status">
+      <div class="status-head">
+        <h2>Status</h2>
+        <span id="connectionState" class="badge">Loading</span>
+      </div>
+      <pre id="status" aria-live="polite">Loading...</pre>
+    </section>
+  </main>
+</body>
+</html>

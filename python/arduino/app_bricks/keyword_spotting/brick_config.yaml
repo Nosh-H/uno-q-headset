@@ -1,0 +1,28 @@
+id: arduino:keyword_spotting
+name: Keyword Spotting
+description: |
+  Brick for keyword spotting using a pre-trained model. It processes audio input to detect specific keywords or phrases.
+  Brick is designed to work with pre-trained models provided by framework or with custom audio classification models trained on Edge Impulse platform.
+category: audio
+required_devices:
+  - microphone
+requires_container: true
+requires_model: true
+ai_frameworks_compatibility:
+  - edgeimpulse
+model: keyword-spotting-hey-arduino
+model_configuration_variables:
+  - EI_KEYWORD_SPOTTING_MODEL
+variables:
+- name: EI_KEYWORD_SPOTTING_MODEL
+  description: Path to the model file
+  hidden: true
+  default_value: /models/ootb/ei/keyword-spotting-hey-arduino.eim
+- name: CUSTOM_MODEL_PATH
+  description: Path to the custom model directory
+  hidden: true
+  default_value: /home/arduino/.arduino-bricks/ei-models
+- name: BIND_ADDRESS
+  description: Bind address
+  hidden: true
+  default_value: 127.0.0.1

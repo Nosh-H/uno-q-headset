@@ -1,0 +1,42 @@
+# Python
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.mypy_cache/
+.pytest_cache/
+.coverage
+coverage.xml
+
+# Build / packaging
+build/
+dist/
+*.egg-info/
+pip-wheel-metadata/
+
+# IDE / OS
+.vscode/
+.idea/
+.vs/
+.DS_Store
+Thumbs.db
+
+# Arduino / embedded
+sketch/build/
+.pio/
+.pioenvs/
+*.hex
+*.elf
+*.bin
+*.o
+
+# General
+.cache/
+.env
+*.pem
+*.key
+credentials.json
+agents

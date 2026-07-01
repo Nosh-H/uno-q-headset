@@ -1,0 +1,6 @@
+id: arduino:wave_generator
+name: Wave Generator
+description: "Continuous wave generator for audio synthesis. Generates sine, square, sawtooth, and triangle waveforms with smooth frequency and amplitude transitions."
+category: audio
+required_devices:
+  - speaker

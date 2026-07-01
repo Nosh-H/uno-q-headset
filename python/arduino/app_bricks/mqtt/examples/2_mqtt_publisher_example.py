@@ -1,0 +1,21 @@
+# SPDX-FileCopyrightText: Copyright (C) Arduino s.r.l. and/or its affiliated companies
+#
+# SPDX-License-Identifier: MPL-2.0
+
+# EXAMPLE_NAME = "Publish message"
+# EXAMPLE_REQUIRES = "Requires an MQTT broker running locally on port 1883."
+import time
+from python.arduino.app_bricks.mqtt import MQTT
+from python.arduino.app_utils import App
+
+client = MQTT(broker_address="127.0.0.1", broker_port=1883, username="admin", password="password")
+
+App.start_brick(client)
+
+
+def keep_publishing():
+    client.publish("test/topic", "Hello Arduino")
+    time.sleep(5)
+
+
+App.run(user_loop=keep_publishing)

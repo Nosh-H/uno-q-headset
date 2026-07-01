@@ -1,0 +1,26 @@
+id: arduino:image_classification
+name: Image Classification
+description: |
+  Brick for image classification using a pre-trained model. It processes images and returns the predicted class label and confidence score.
+  Brick is designed to work with pre-trained models provided by framework or with custom image classification models trained on Edge Impulse platform. 
+category: video
+requires_container: true
+requires_model: true
+ai_frameworks_compatibility:
+  - edgeimpulse
+model: mobilenet-image-classification
+model_configuration_variables:
+  - EI_CLASSIFICATION_MODEL
+variables:
+- name: EI_CLASSIFICATION_MODEL
+  description: Path to the model file
+  hidden: true
+  default_value: /models/ootb/ei/mobilenet-v2-224px.eim
+- name: CUSTOM_MODEL_PATH
+  description: Path to the custom model directory
+  hidden: true
+  default_value: /home/arduino/.arduino-bricks/ei-models
+- name: BIND_ADDRESS
+  description: Bind address
+  hidden: true
+  default_value: 127.0.0.1
