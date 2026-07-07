@@ -1,5 +1,5 @@
 name: uno-q-headset
 description: ""
-ports: []
+ports: [8000]
 bricks: []
 icon: 😀

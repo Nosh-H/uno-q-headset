@@ -74,7 +74,8 @@ int getSensor() {
 }
 
 /* Meant to be called by the bridge*/
-bool getState(uint8_t side) {
+bool getState(int side) {
+  Serial.println("GET STATE CALLED");
   if (side == 1) {
     return rightArmState;
   } else if (side == 0) {
@@ -92,7 +93,8 @@ String getStatus() {
 }
 
 /** Meant to be called by the bridge */
-float getTemp(uint8_t side) {
+float getTemp(int side) {
+  Serial.println("GET TEMP CALLED");
   if (side == 1) {
     return rightThermo.getDegreesFahrenheit();
   } else if (side == 0) {
@@ -106,7 +108,8 @@ void setMode(int mode) {
   currentMode = mode;
 }
 
-void setState(uint8_t side, bool state) {
+void setState(int side, bool state) {
+  Serial.println("SET STATE CALLED");
   if (side == 1) {
     rightArmState = state;
   } else if (side == 0) {
@@ -118,6 +121,7 @@ void setState(uint8_t side, bool state) {
 
 // Emergency stop
 void stopAll() {
+  Serial.println("EMERGENCY STOP");
   setLed(false);
   currentMode = 0;
   // Also stop motors, relays, PWM outputs, etc.
@@ -129,6 +133,7 @@ void setup() {
   digitalWrite(headset_config::LED_PIN, LOW);
   leftThermo.setup();
   rightThermo.setup();
+  Serial.begin(9600);
 
   // Register RPC-callable functions here. Template: 
   Bridge.begin();

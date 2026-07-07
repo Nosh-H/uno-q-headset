@@ -52,17 +52,8 @@ app = FastAPI(lifespan=lifespan)
 # 3. Mount static files
 app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
 
-@app.get("/")
-def read_root():
-    return {"message": "App is poooooping"}
-
-# 4. Start the server (Crucial step to prevent exit code 0)
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
-
 class LedCommand(BaseModel):
     on: bool
-
 
 class ModeCommand(BaseModel):
     mode: int
@@ -136,3 +127,7 @@ def stop_all():
         return controller.emergency_stop()
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc))
+
+# 4. Start the server (Crucial step to prevent exit code 0)
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)
