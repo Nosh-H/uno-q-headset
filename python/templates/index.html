@@ -11,21 +11,30 @@
   <main class="shell">
     <section class="hero">
       <p class="eyebrow">Uno Q Headset</p>
-      <h1>Local control for the headset prototype</h1>
+      <h1>Control the Headset!</h1>
       <p class="lede">
         This interface talks to the Python controller, which forwards commands to the Arduino Uno Q firmware.
+        The LED and Mode buttons are a test.
+        As for the arm toggles, right is on, which means that arm will go DOWN.
+        The Emergency Stop button will eventually set the motor output to zero.
       </p>
     </section>
 
     <section class="panel controls">
       <div class="control-group">
         <h2>LED</h2>
-        <div class="button-row">
-          <button type="button" data-action="led" data-on="true">LED On</button>
-          <button type="button" data-action="led" data-on="false">LED Off</button>
-        </div>
-      </div>
+        <!--
+        Source - https://stackoverflow.com/q/73691719
+        Posted by Connor
+        Retrieved 2026-07-10, License - CC BY-SA 4.0
+        -->
 
+        <!-- Rounded switch -->
+        <label class="switch">
+          <input type="checkbox">
+          <span class="slider round"></span>
+        </label>
+      </div>
       <div class="control-group">
         <h2>Mode</h2>
         <div class="button-row">
@@ -38,16 +47,25 @@
 
       <div class="control-group">
         <h2>Arms</h2>
-        <div class="button-row">
-          <button type="button" data-action="state" data-side="0" data-state="true">Left Down</button>
-          <button type="button" data-action="state" data-side="0" data-state="false">Left Up</button>
-          <button type="button" data-action="state" data-side="1" data-state="true">Right Down</button>
-          <button type="button" data-action="state" data-side="1" data-state="false">Right Up</button>
+        <div class="switch-row">
+          <div class="switch-item">
+            <span>Left</span>
+            <label class="switch">
+              <input type="checkbox" data-action="state" data-side="0">
+              <span class="slider round"></span>
+            </label>
+          </div>
+          <div class="switch-item">
+            <span>Right</span>
+            <label class="switch">
+              <input type="checkbox" data-action="state" data-side="1">
+              <span class="slider round"></span>
+            </label>
+          </div>
         </div>
       </div>
 
       <div class="control-group">
-        <h2>Safety</h2>
         <div class="button-row">
           <button type="button" class="danger" data-action="stop">Emergency Stop</button>
         </div>

@@ -83,12 +83,11 @@ async function stopAll() {
 }
 
 function wireControls() {
-  document.querySelectorAll("[data-action='led']").forEach((button) => {
-    button.addEventListener("click", () => setLed(button.dataset.on === "true"));
-  });
+  const ledSwitch = document.querySelector(".switch input[type='checkbox']");
+  ledSwitch.addEventListener("change", () => setLed(ledSwitch.checked));
 
-  document.querySelectorAll("[data-action='state']").forEach((button) => {
-    button.addEventListener("click", () => setState(Number(button.dataset.side), button.dataset.state === "true"));
+  document.querySelectorAll("[data-action='state']").forEach((armSwitch) => {
+    armSwitch.addEventListener("change", () => setState(Number(armSwitch.dataset.side), armSwitch.checked));
   });
 
   document.querySelectorAll("[data-action='mode']").forEach((button) => {

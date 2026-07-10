@@ -1,39 +1,42 @@
+@font-face {
+  font-family: 'Trebuchet MS';
+  src: url('/static/trebuc.ttf') format('truetype');
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Trebuchet MS';
+  src: url('/static/Trebuchet-MS-Italic.ttf') format('truetype');
+  font-style: italic;
+}
+
 :root {
   color-scheme: dark;
-  --bg: #0f1117;
-  --panel: rgba(17, 20, 29, 0.9);
-  --panel-border: rgba(255, 255, 255, 0.08);
-  --text: #edf2ff;
-  --muted: #aeb7ce;
-  --accent: #6dc7ff;
-  --accent-strong: #3aa0ff;
-  --danger: #ff6b6b;
-  --success: #6be39a;
-  --shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+  --bg: #1c1c1c;
+  --panel: #262626;
+  --panel-border: #3a3a3a;
+  --text: #e6e6e6;
+  --muted: #999;
+  --accent: #4a90d9;
+  --danger: #cc4444;
+  --success: #4caf50;
 }
 
 * {
   box-sizing: border-box;
 }
 
-html, body {
-  min-height: 100%;
-}
-
 body {
   margin: 0;
-  font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Trebuchet MS', Arial, Helvetica, sans-serif;
   color: var(--text);
-  background:
-    radial-gradient(circle at top left, rgba(58, 160, 255, 0.18), transparent 36%),
-    radial-gradient(circle at top right, rgba(109, 199, 255, 0.12), transparent 28%),
-    linear-gradient(180deg, #0b0d12, var(--bg));
+  background: var(--bg);
 }
 
 .shell {
-  width: min(1040px, calc(100% - 2rem));
+  max-width: 780px;
   margin: 0 auto;
-  padding: 3rem 0 4rem;
+  padding: 2rem 1rem;
 }
 
 .hero {
@@ -41,88 +44,87 @@ body {
 }
 
 .eyebrow {
-  margin: 0 0 0.5rem;
-  text-transform: uppercase;
-  letter-spacing: 0.16em;
-  font-size: 0.78rem;
-  color: var(--accent);
+  margin: 0 0 0.25rem;
+  font-size: 0.8rem;
+  color: var(--muted);
 }
 
 h1 {
-  margin: 0;
-  font-size: clamp(2.2rem, 4vw, 4.2rem);
-  line-height: 1.03;
+  margin: 0 0 0.5rem;
+  font-size: 1.8rem;
 }
 
 .lede {
-  margin: 0.9rem 0 0;
-  max-width: 62ch;
+  margin: 0;
+  max-width: 100ch;
   color: var(--muted);
-  font-size: 1.02rem;
+  font-size: 0.95rem;
 }
 
 .panel {
   background: var(--panel);
   border: 1px solid var(--panel-border);
-  border-radius: 24px;
-  box-shadow: var(--shadow);
-  backdrop-filter: blur(18px);
 }
 
 .controls {
-  display: grid;
-  gap: 1.25rem;
-  padding: 1.25rem;
+  padding: 1rem;
+}
+
+.control-group {
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--panel-border);
+}
+
+.control-group:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
 }
 
 .control-group h2,
 .status h2 {
-  margin: 0 0 0.9rem;
-  font-size: 1rem;
-  letter-spacing: 0.02em;
+  margin: 0 0 0.5rem;
+  font-size: 0.95rem;
 }
 
 .button-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
+  gap: 0.5rem;
 }
 
 button {
-  appearance: none;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid #555;
+  background: #333;
   color: var(--text);
-  border-radius: 999px;
-  padding: 0.8rem 1.05rem;
+  padding: 0.5rem 0.9rem;
   font: inherit;
+  font-size: 0.9rem;
   cursor: pointer;
-  transition: transform 140ms ease, border-color 140ms ease, background 140ms ease;
 }
 
 button:hover {
-  transform: translateY(-1px);
-  border-color: rgba(109, 199, 255, 0.38);
-  background: rgba(109, 199, 255, 0.12);
+  background: #3d3d3d;
 }
 
 button:active {
-  transform: translateY(0);
+  background: #444;
 }
 
 button.danger {
-  border-color: rgba(255, 107, 107, 0.25);
-  background: rgba(255, 107, 107, 0.12);
+  border-color: var(--danger);
+  color: #ffb3b3;
+  background: #3a1f1f;
 }
 
 button.danger:hover {
-  border-color: rgba(255, 107, 107, 0.45);
-  background: rgba(255, 107, 107, 0.18);
+  background: #4a2626;
 }
 
 .status {
-  margin-top: 1.25rem;
-  padding: 1.25rem;
+  margin-top: 1rem;
+  padding: 1rem;
 }
 
 .status-head {
@@ -130,59 +132,117 @@ button.danger:hover {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  margin-bottom: 0.9rem;
+  margin-bottom: 0.5rem;
 }
 
 .badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 2rem;
-  padding: 0.25rem 0.75rem;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.05);
+  padding: 0.2rem 0.6rem;
+  border: 1px solid #555;
   color: var(--muted);
-  font-size: 0.85rem;
+  font-size: 0.8rem;
 }
 
 .badge[data-state="ok"] {
   color: var(--success);
-  border-color: rgba(107, 227, 154, 0.24);
-  background: rgba(107, 227, 154, 0.09);
+  border-color: var(--success);
 }
 
 .badge[data-state="error"] {
   color: var(--danger);
-  border-color: rgba(255, 107, 107, 0.26);
-  background: rgba(255, 107, 107, 0.09);
+  border-color: var(--danger);
 }
 
 pre {
   margin: 0;
-  padding: 1rem;
+  padding: 0.75rem;
   overflow: auto;
-  border-radius: 18px;
-  background: rgba(4, 6, 12, 0.55);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  color: #d8e2ff;
-  font-size: 0.92rem;
-  line-height: 1.5;
+  background: #141414;
+  border: 1px solid var(--panel-border);
+  color: #ccc;
+  font-size: 0.85rem;
+  line-height: 1.4;
 }
 
 @media (max-width: 720px) {
-  .shell {
-    width: min(100% - 1rem, 1040px);
-    padding-top: 1.25rem;
-  }
-
-  .controls,
-  .status {
-    padding: 1rem;
-  }
-
   .status-head {
     align-items: flex-start;
     flex-direction: column;
   }
+}
+
+/*
+Source - https://stackoverflow.com/q/73691719
+Posted by Connor
+Retrieved 2026-07-10, License - CC BY-SA 4.0
+*/
+
+/* The switch - the box around the slider */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 28px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #555;
+  transition: .3s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 4px;
+  bottom: 4px;
+  background-color: #ddd;
+  transition: .3s;
+}
+
+input:checked + .slider {
+  background-color: var(--accent);
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px var(--accent);
+}
+
+input:checked + .slider:before {
+  transform: translateX(22px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 28px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+.switch-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+}
+
+.switch-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }

@@ -12,11 +12,9 @@
  *  You should have received a copy of the GNU General Public License along with this program. If
  *  not, see <https://www.gnu.org/licenses/>.
  *  
- *  File: main.py
+ *  File: controller.py
  *  Author: Noah Haskell
- *  Description: "The Headset" is currently a prototype to automate the application of a cold compress on the wearer's eyes. 
- *  This is intended to treat eye itching and pain caused by allergies.
- *  This is the main python file for the Headset. Its key role is to run the app bridging the web interface with the microcontroller code.
+ *  Description: The BridgeClient's role is to handle all commuication with the microcontroller through the Arduino Bridge.
 """
 
 # app/bridge_client.py
