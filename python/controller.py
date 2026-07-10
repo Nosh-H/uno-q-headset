@@ -1,3 +1,24 @@
+"""
+ *  Copyright (C) 2026 Noah Haskell
+ *  
+ *  This program is free software: you can redistribute it and/or modify it under the terms of the
+ *  GNU General Public License as published by the Free Software Foundation, either version 3 of the
+ *  License, or any later version.
+ *  
+ *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ *  even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ *  General Public License for more details.
+ *  
+ *  You should have received a copy of the GNU General Public License along with this program. If
+ *  not, see <https://www.gnu.org/licenses/>.
+ *  
+ *  File: main.py
+ *  Author: Noah Haskell
+ *  Description: "The Headset" is currently a prototype to automate the application of a cold compress on the wearer's eyes. 
+ *  This is intended to treat eye itching and pain caused by allergies.
+ *  This is the main python file for the Headset. Its key role is to run the app bridging the web interface with the microcontroller code.
+"""
+
 # app/controller.py
 
 import threading

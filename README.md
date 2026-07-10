@@ -1,6 +1,6 @@
 # Uno Q Headset
 
-Uno Q Headset is a prototype control system for a wearable headset built around an Arduino Uno Q and a Python web app. The goal is to coordinate physical hardware behavior on the microcontroller with remote control from a browser over the local network.
+Uno Q Headset is a prototype control system for a wearable headset built around an Arduino Uno Q and a Python web app. The goal is to coordinate physical hardware behavior on the microcontroller with remote control from a browser over the local network, in order to automate the application of a cold compress on the wearer's eyes for the goal of treating eye itching and pain caused by allergies.
 
 This repository currently contains two main parts:
 
@@ -51,6 +51,19 @@ The current Python app serves an inline HTML page from `python/main.py`. It expo
 
 The page polls status periodically and sends commands back to the controller. The controller also mirrors the arm state and temperatures returned by the firmware bridge so the browser can read them back without talking to the MCU directly.
 
+## Hardware Control In The Sketch
+
+The C++ side is structured as a small embedded control loop rather than a collection of one-off callbacks. In `sketch/sketch.ino`, the firmware keeps the live hardware state in a few shared variables (arm state, LED state, current mode) and updates them through RPC handlers registered with the Bridge. Those handlers are intentionally lightweight: they change control state or request a mode transition, while the `periodic()` loop is responsible for quickly applying that state to the hardware.
+
+The supporting C++ files reinforce that split: 
+- Pin mapping and board-specific constants live in `sketch/Constants.hpp`
+- Button handling is wrapped in `DigitalInput` for debouncing and edge detection
+- Temperature sensing is isolated in `Thermometer` so the main sketch can treat sensing as a service rather than embedding hardware details inline. 
+
+This way, the firmware can keep safety-sensitive behavior local to the microcontroller and avoid relying on web requests for timing.
+
+Motor control is still in progress, but the architecture already points toward the intended structure: `sketch.ino` computes desired setpoints from the current arm state, and the lower-level motion implementation is expected to consume those setpoints once it is fully wired up.
+
 ## Working On The Codebase
 
 - Keep changes small and readable.
@@ -65,3 +78,6 @@ The page polls status periodically and sends commands back to the controller. Th
 - This is still a prototype, so some bridge calls and hardware behaviors may be placeholders or incomplete.
 - If a Python command does not line up with a firmware RPC, update both sides together instead of assuming one side is correct.
 - The root README is intentionally focused on orientation. The deeper implementation details belong in code comments and the assistant instructions.
+
+## License
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version.
