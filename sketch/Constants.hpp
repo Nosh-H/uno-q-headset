@@ -30,6 +30,10 @@ constexpr uint8_t ONE_WIRE_BUS_LEFT = 4;
 constexpr uint8_t ONE_WIRE_BUS_RIGHT = 10;
 constexpr double THERMOMETER_PERIOD_MS = 1000.0;
 
+const int MOTOR_A_PINS[3] = {9, 10, 5};
+const int MOTOR_B_PINS[3] = {11, 12, 6};
+
+// Currently not using encoders
 constexpr uint8_t FIRST_ENCODER_A_PIN = 2;
 constexpr uint8_t FIRST_ENCODER_B_PIN = 5;
 constexpr uint8_t SECOND_ENCODER_A_PIN = 6;
@@ -39,11 +43,12 @@ constexpr uint8_t MOTOR_COUNT = 2;
 constexpr int DIRECTION_PINS[MOTOR_COUNT] = {12, 13};
 constexpr int PWM_PINS[MOTOR_COUNT] = {3, 11};
 constexpr int BRAKE_PINS[MOTOR_COUNT] = {9, 8};
-constexpr bool INVERT_MOTOR = false;
+constexpr bool INVERT_MOTOR_A = false;
+constexpr bool INVERT_MOTOR_B = false;
 
-constexpr int HIGH_POS = 800;
-constexpr int LOW_POS = -50;
-constexpr int STATIC_GAIN[MOTOR_COUNT] = {255, 73};
+constexpr int TO_HIGH_POS_OUTPUT = 200;
+constexpr int TO_LOW_POS_OUTPUT = 150;
+constexpr int STATIC_GAIN[MOTOR_COUNT] = {255, 73}; // TUNE
 
 constexpr uint8_t LEFT_BUTTON = A0;
 constexpr uint8_t RIGHT_BUTTON = A1;

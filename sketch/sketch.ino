@@ -23,13 +23,12 @@
 #include <Arduino_RouterBridge.h>
 // #include <util/atomic.h>
 #include <DallasTemperature.h>
+#include "DCMotor.hpp"
 #include "DigitalInput.hpp"
 #include "Constants.hpp"
 #include <OneWire.h>
 #include "Thermometer.hpp"
 #include <zephyr/kernel.h> // Required for Zephyr RTOS Timer APIs
-
-// I looked heavily at the current Arduino Bridge examples/docs.
 
 bool ledState = false;
 int currentMode = 0;
@@ -41,14 +40,18 @@ Thermometer rightThermo(headset_config::ONE_WIRE_BUS_RIGHT, headset_config::THER
 // Encoders firstEncoder(headset_config::FIRST_ENCODER_A_PIN, headset_config::FIRST_ENCODER_B_PIN);
 // Encoders secondEncoder(headset_config::SECOND_ENCODER_A_PIN, headset_config::SECOND_ENCODER_B_PIN); // the encoder objects could use analog pins
 
-// Initial target position
-int setpoints[headset_config::MOTOR_COUNT] = {headset_config::HIGH_POS, headset_config::HIGH_POS};
+// Initial target outputs - high {left, right}
+int setpoints[headset_config::MOTOR_COUNT] = {headset_config::TO_HIGH_POS_OUTPUT, headset_config::TO_HIGH_POS_OUTPUT};
 
 // For PID time calculation
 long prevT = 0;
 
 // Counter for printing position on the serial
 int counter = 0;
+
+// Global DCMotor instances: safe because constructor does not call Arduino APIs.
+DCMotor motorA(headset_config::MOTOR_A_PINS, 3, headset_config::INVERT_MOTOR_A);
+DCMotor motorB(headset_config::MOTOR_B_PINS, 3, headset_config::INVERT_MOTOR_B);
 
 // Define button pins
 // https://forum.arduino.cc/t/using-analog-pins-for-push-buttons/309407/7
@@ -133,6 +136,8 @@ void setup() {
   digitalWrite(headset_config::LED_PIN, LOW);
   leftThermo.setup();
   rightThermo.setup();
+  motorA.begin();
+  motorB.begin();
   Serial.begin(9600);
 
   // Register RPC-callable functions here. Template: 
@@ -164,16 +169,28 @@ void checkButtons() {
   }
 }
 
-/** Applies the state to the motor setpoints. Should be called periodically. */
+/** Applies the state to the motor setpoints and runs motors. Should be called periodically. */
 void updateSetpoints() {
-  setpoints[0] = (leftArmState ? headset_config::LOW_POS : headset_config::HIGH_POS);
-  setpoints[1] = (rightArmState ? headset_config::LOW_POS: headset_config::HIGH_POS);
+  setpoints[0] = (leftArmState ? headset_config::TO_LOW_POS_OUTPUT : headset_config::TO_HIGH_POS_OUTPUT);
+  setpoints[1] = (rightArmState ? headset_config::TO_LOW_POS_OUTPUT: headset_config::TO_HIGH_POS_OUTPUT);
+
+  // For now, simple control of motors
+  // TODO: implement current spike detection to trigger hold at setpoint (high - brake / low - coast)
+  if (leftArmState) {
+    motorA.run_motor(-1, setpoints[0]);
+  } else {
+    motorA.run_motor(1, setpoints[1]);
+  }
+  if (rightArmState) {
+    motorB.run_motor(-1, setpoints[0]);
+  } else {
+    motorB.run_motor(1, setpoints[1]);
+  }
 }
 
 void periodic() {
   // Keep time-critical hardware behavior here
   // Do not depend on web requests for safety-critical timing.
-  // Bridge polling/update call if required by the library.
 
   // Can put thermometer calls into a periodic() called less often
   leftThermo.periodic();

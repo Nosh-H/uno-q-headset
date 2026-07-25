@@ -21,7 +21,7 @@
 #ifndef DIGITALINPUT_HPP
 #define DIGITALINPUT_HPP
 #include <Arduino.h>
-#include <TimeDebounce.hpp>
+#include "TimeDebounce.hpp"
 
 class DigitalInput {
 public:
