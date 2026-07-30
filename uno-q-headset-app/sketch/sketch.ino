@@ -171,21 +171,27 @@ void checkButtons() {
 
 /** Applies the state to the motor setpoints and runs motors. Should be called periodically. */
 void updateSetpoints() {
-  setpoints[0] = (leftArmState ? headset_config::TO_LOW_POS_OUTPUT : headset_config::TO_HIGH_POS_OUTPUT);
-  setpoints[1] = (rightArmState ? headset_config::TO_LOW_POS_OUTPUT: headset_config::TO_HIGH_POS_OUTPUT);
+  const int leftDirection = leftArmState ? -1 : 1;
+  const int leftPwm = leftArmState ? headset_config::TO_LOW_POS_OUTPUT : headset_config::TO_HIGH_POS_OUTPUT;
 
-  // For now, simple control of motors
-  // TODO: implement current spike detection to trigger hold at setpoint (high - brake / low - coast)
-  if (leftArmState) {
-    motorA.run_motor(-1, setpoints[0]);
-  } else {
-    motorA.run_motor(1, setpoints[1]);
-  }
+  setpoints[0] = leftPwm;
+  setpoints[1] = (rightArmState ? headset_config::TO_LOW_POS_OUTPUT : headset_config::TO_HIGH_POS_OUTPUT);
+
+  Serial.print("leftArmState=");
+  Serial.print(leftArmState);
+  Serial.print(" leftDirection=");
+  Serial.print(leftDirection);
+  Serial.print(" leftPwm=");
+  Serial.println(leftPwm);
+
+  motorA.run_motor(leftDirection, leftPwm);
+
   if (rightArmState) {
-    motorB.run_motor(-1, setpoints[0]);
+    motorB.run_motor(-1, setpoints[1]);
   } else {
     motorB.run_motor(1, setpoints[1]);
   }
+  delay(200);
 }
 
 void periodic() {

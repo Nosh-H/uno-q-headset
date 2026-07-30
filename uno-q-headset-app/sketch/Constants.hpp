@@ -47,7 +47,7 @@ constexpr bool INVERT_MOTOR_A = false;
 constexpr bool INVERT_MOTOR_B = false;
 
 constexpr int TO_HIGH_POS_OUTPUT = 200;
-constexpr int TO_LOW_POS_OUTPUT = 150;
+constexpr int TO_LOW_POS_OUTPUT = 200;
 constexpr int STATIC_GAIN[MOTOR_COUNT] = {255, 73}; // TUNE
 
 constexpr uint8_t LEFT_BUTTON = A0;

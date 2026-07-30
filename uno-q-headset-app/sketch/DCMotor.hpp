@@ -120,13 +120,16 @@ public:
         else if (dir == 1)
         {
             // Forward direction
+            Serial.println("--------------------FORWARD")
             digitalWrite(pinIDs[0], HIGH);
             digitalWrite(pinIDs[1], LOW);
             analogWrite(pinIDs[2], pwm);
         }
         else if (dir == -1)
         {
+            // Is something wrong here?
             // Reverse direction
+            Serial.println("--------------------REVERSE");
             digitalWrite(pinIDs[0], LOW);
             digitalWrite(pinIDs[1], HIGH);
             analogWrite(pinIDs[2], pwm);
@@ -134,7 +137,7 @@ public:
         else
         {
             // Brake motor
-            digitalWrite(pinIDs[0], LOW);
+            digitalWrite(pinIDs[0], HIGH);
             digitalWrite(pinIDs[1], HIGH);
             analogWrite(pinIDs[2], 0);
         }
