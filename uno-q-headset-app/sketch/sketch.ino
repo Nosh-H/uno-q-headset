@@ -51,11 +51,11 @@ bool leftArmState = false; // HIGH = false (off eye)
 bool rightArmState = false; // LOW = true (on eye)
 DigitalInput leftButton(headset_config::LEFT_BUTTON, headset_config::BUTTON_PULLUP, headset_config::BUTTON_DEBOUNCE_RISING_MS, headset_config::BUTTON_DEBOUNCE_FALLING_MS); // Verify if there is no pullup resistor
 DigitalInput rightButton(headset_config::RIGHT_BUTTON, headset_config::BUTTON_PULLUP, headset_config::BUTTON_DEBOUNCE_RISING_MS, headset_config::BUTTON_DEBOUNCE_FALLING_MS);
-DigitalInput homeButton(headset_config::HOME_BUTTON, headset_config::BUTTON_PULLUP, headset_config::BUTTON_DEBOUNCE_RISING_MS, headset_config::BUTTON_DEBOUNCE_FALLING_MS); // Likely not needed if stepper is chosen
+DigitalInput eStopButton(headset_config::E_STOP_BUTTON, headset_config::BUTTON_PULLUP, headset_config::BUTTON_DEBOUNCE_RISING_MS, headset_config::BUTTON_DEBOUNCE_FALLING_MS); // Likely not needed if stepper is chosen
 
 void setLed(bool on) {
   ledState = on;
-  digitalWrite(headset_config::LED_PIN, on ? HIGH : LOW);
+  digitalWrite(headset_config::LED_PIN, on ? LOW : HIGH);
 }
 
 // Test Only (for the Bridge and python program)
@@ -112,9 +112,11 @@ void setState(int side, bool state) {
 // Emergency stop
 void stopAll() {
   Serial.println("EMERGENCY STOP");
-  setLed(false);
+  setLed(true);
   currentMode = 0;
-  // Also stop motors, relays, PWM outputs, etc.
+  // Coast Motors
+  motorA.run_motor(0, 0);
+  motorB.run_motor(0, 0);
 
 }
 
@@ -150,9 +152,9 @@ void checkButtons() {
     rightArmState = !rightArmState;
   }
   
-  // Zero the motor encoders right when home button is pressed
-  if (homeButton.onRisingEdge()) {
-    // resetEncoders();
+  // Emergency stop
+  if (eStopButton.onRisingEdge()) {
+    stopAll();
   }
 }
 

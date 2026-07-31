@@ -41,11 +41,10 @@ constexpr bool INVERT_MOTOR_B = false;
 
 constexpr int TO_HIGH_POS_OUTPUT = 200;
 constexpr int TO_LOW_POS_OUTPUT = 200;
-constexpr int STATIC_GAIN[MOTOR_COUNT] = {255, 73}; // TUNE
 
 constexpr uint8_t LEFT_BUTTON = A0;
 constexpr uint8_t RIGHT_BUTTON = A1;
-constexpr uint8_t HOME_BUTTON = A2;
+constexpr uint8_t E_STOP_BUTTON = A2;
 constexpr bool BUTTON_PULLUP = false;
 constexpr uint16_t BUTTON_DEBOUNCE_RISING_MS = 50;
 constexpr uint16_t BUTTON_DEBOUNCE_FALLING_MS = 50;

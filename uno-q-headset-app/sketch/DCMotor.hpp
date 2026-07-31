@@ -117,9 +117,9 @@ public:
         if (pwm == 0) 
         {
             // Coast
-            analogWrite(pinIDs[2], 0);
-            digitalWrite(pinIDs[0], HIGH);
+            digitalWrite(pinIDs[0], LOW);
             digitalWrite(pinIDs[1], LOW);
+            analogWrite(pinIDs[2], 0);
         }
         else if (dir == 1)
         {
