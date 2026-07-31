@@ -30,19 +30,12 @@ constexpr uint8_t ONE_WIRE_BUS_LEFT = 4;
 constexpr uint8_t ONE_WIRE_BUS_RIGHT = 10;
 constexpr double THERMOMETER_PERIOD_MS = 1000.0;
 
-const int MOTOR_A_PINS[3] = {9, 10, 5};
+// NO LONGER USING PIN 10 FOR DIRECTION - TESTED TO NOT WORK (likely due to thermometer pin conflict)
+const int MOTOR_A_PINS[3] = {8, 9, 5};
 const int MOTOR_B_PINS[3] = {11, 12, 6};
 
-// Currently not using encoders
-constexpr uint8_t FIRST_ENCODER_A_PIN = 2;
-constexpr uint8_t FIRST_ENCODER_B_PIN = 5;
-constexpr uint8_t SECOND_ENCODER_A_PIN = 6;
-constexpr uint8_t SECOND_ENCODER_B_PIN = 7;
 constexpr uint8_t MOTOR_COUNT = 2;
 
-constexpr int DIRECTION_PINS[MOTOR_COUNT] = {12, 13};
-constexpr int PWM_PINS[MOTOR_COUNT] = {3, 11};
-constexpr int BRAKE_PINS[MOTOR_COUNT] = {9, 8};
 constexpr bool INVERT_MOTOR_A = false;
 constexpr bool INVERT_MOTOR_B = false;
 

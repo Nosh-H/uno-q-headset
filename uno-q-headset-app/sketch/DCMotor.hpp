@@ -14,7 +14,7 @@
  *  
  *  File: DCMotor.hpp
  *  Author: Noah Haskell
- *  Date: 24 July 2026
+ *  Date: 30 July 2026
  *  Decription: A class to control a DC motor with a L293D motor driver. Currently not using an encoder for closed loop control.
  */
 #ifndef DCMOTOR_HPP
@@ -66,6 +66,10 @@ public:
         if (pin_count_ > 2)
             pinMode(pinIDs[2], OUTPUT);
 
+            // Coast motor during startup
+            digitalWrite(pinIDs[0], LOW);
+            digitalWrite(pinIDs[1], LOW);
+            analogWrite(pinIDs[2], 0);
     }
 
     /**
@@ -120,7 +124,7 @@ public:
         else if (dir == 1)
         {
             // Forward direction
-            Serial.println("--------------------FORWARD")
+            Serial.println("--------------------FORWARD");
             digitalWrite(pinIDs[0], HIGH);
             digitalWrite(pinIDs[1], LOW);
             analogWrite(pinIDs[2], pwm);

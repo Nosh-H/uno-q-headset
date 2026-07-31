@@ -37,29 +37,16 @@ int currentMode = 0;
 Thermometer leftThermo(headset_config::ONE_WIRE_BUS_LEFT, headset_config::THERMOMETER_PERIOD_MS);
 Thermometer rightThermo(headset_config::ONE_WIRE_BUS_RIGHT, headset_config::THERMOMETER_PERIOD_MS);
 
-// Encoders firstEncoder(headset_config::FIRST_ENCODER_A_PIN, headset_config::FIRST_ENCODER_B_PIN);
-// Encoders secondEncoder(headset_config::SECOND_ENCODER_A_PIN, headset_config::SECOND_ENCODER_B_PIN); // the encoder objects could use analog pins
-
 // Initial target outputs - high {left, right}
 int setpoints[headset_config::MOTOR_COUNT] = {headset_config::TO_HIGH_POS_OUTPUT, headset_config::TO_HIGH_POS_OUTPUT};
-
-// For PID time calculation
-long prevT = 0;
-
-// Counter for printing position on the serial
-int counter = 0;
 
 // Global DCMotor instances: safe because constructor does not call Arduino APIs.
 DCMotor motorA(headset_config::MOTOR_A_PINS, 3, headset_config::INVERT_MOTOR_A);
 DCMotor motorB(headset_config::MOTOR_B_PINS, 3, headset_config::INVERT_MOTOR_B);
 
-// Define button pins
+// Define button pins to toggle arms
 // https://forum.arduino.cc/t/using-analog-pins-for-push-buttons/309407/7
-// Press this to zero the encoders. TODO: Make the press of this button start homing
-// Records the button state. Either HIGH or LOW.
-int leftButtonState = LOW;
-int rightButtonState = LOW;
-bool homeButtonState = LOW;
+// TODO: Convert the "HOME" button to an Emergency Stop Button
 bool leftArmState = false; // HIGH = false (off eye)
 bool rightArmState = false; // LOW = true (on eye)
 DigitalInput leftButton(headset_config::LEFT_BUTTON, headset_config::BUTTON_PULLUP, headset_config::BUTTON_DEBOUNCE_RISING_MS, headset_config::BUTTON_DEBOUNCE_FALLING_MS); // Verify if there is no pullup resistor
@@ -171,26 +158,20 @@ void checkButtons() {
 
 /** Applies the state to the motor setpoints and runs motors. Should be called periodically. */
 void updateSetpoints() {
-  const int leftDirection = leftArmState ? -1 : 1;
-  const int leftPwm = leftArmState ? headset_config::TO_LOW_POS_OUTPUT : headset_config::TO_HIGH_POS_OUTPUT;
-
-  setpoints[0] = leftPwm;
-  setpoints[1] = (rightArmState ? headset_config::TO_LOW_POS_OUTPUT : headset_config::TO_HIGH_POS_OUTPUT);
-
-  Serial.print("leftArmState=");
-  Serial.print(leftArmState);
-  Serial.print(" leftDirection=");
-  Serial.print(leftDirection);
-  Serial.print(" leftPwm=");
-  Serial.println(leftPwm);
-
-  motorA.run_motor(leftDirection, leftPwm);
-
+  
+  if (leftArmState) {
+    motorA.run_motor(-1, setpoints[0]);
+  } else {
+    motorA.run_motor(1, setpoints[0]);
+  }
+  
   if (rightArmState) {
     motorB.run_motor(-1, setpoints[1]);
   } else {
     motorB.run_motor(1, setpoints[1]);
   }
+
+  // TODO: Delete when Uno Q timer code replaces loop()
   delay(200);
 }
 
@@ -202,9 +183,9 @@ void periodic() {
   leftThermo.periodic();
   rightThermo.periodic();
 
+  // Check buttons and update state as necessary
   checkButtons();
-  // Potentially implement checking for updates from main.py
-  // but probably unnecessary as methods are given to the bridge to update global variables instead
+  // Apply motor output based on arm states
   updateSetpoints();
 
 }
