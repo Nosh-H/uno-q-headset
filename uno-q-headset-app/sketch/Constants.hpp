@@ -22,7 +22,18 @@
 
 #include <Arduino.h>
 
-namespace headset_config {
+namespace Constants {
+
+// Debug mode - print out to serial if true (1)
+#define DEBUG 1
+
+#if DEBUG == 1
+#define outputDebug(x) do { Serial.print(x); } while (0)
+#define outputDebugLine(x) do { Serial.println(x); } while (0)
+#else
+#define outputDebug(x) ((void)0)
+#define outputDebugLine(x) ((void)0)
+#endif
 
 constexpr uint8_t LED_PIN = LED_BUILTIN;
 
@@ -49,6 +60,6 @@ constexpr bool BUTTON_PULLUP = false;
 constexpr uint16_t BUTTON_DEBOUNCE_RISING_MS = 50;
 constexpr uint16_t BUTTON_DEBOUNCE_FALLING_MS = 50;
 
-}  // namespace headset_config
+}  // namespace Constants
 
 #endif

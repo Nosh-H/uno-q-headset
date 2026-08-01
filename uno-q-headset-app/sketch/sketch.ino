@@ -34,28 +34,27 @@ bool ledState = false;
 int currentMode = 0;
 
 // Define Sensors
-Thermometer leftThermo(headset_config::ONE_WIRE_BUS_LEFT, headset_config::THERMOMETER_PERIOD_MS);
-Thermometer rightThermo(headset_config::ONE_WIRE_BUS_RIGHT, headset_config::THERMOMETER_PERIOD_MS);
+Thermometer leftThermo(Constants::ONE_WIRE_BUS_LEFT, Constants::THERMOMETER_PERIOD_MS);
+Thermometer rightThermo(Constants::ONE_WIRE_BUS_RIGHT, Constants::THERMOMETER_PERIOD_MS);
 
 // Initial target outputs - high {left, right}
-int setpoints[headset_config::MOTOR_COUNT] = {headset_config::TO_HIGH_POS_OUTPUT, headset_config::TO_HIGH_POS_OUTPUT};
+int setpoints[Constants::MOTOR_COUNT] = {Constants::TO_HIGH_POS_OUTPUT, Constants::TO_HIGH_POS_OUTPUT};
 
 // Global DCMotor instances: safe because constructor does not call Arduino APIs.
-DCMotor motorA(headset_config::MOTOR_A_PINS, 3, headset_config::INVERT_MOTOR_A);
-DCMotor motorB(headset_config::MOTOR_B_PINS, 3, headset_config::INVERT_MOTOR_B);
+DCMotor motorA(Constants::MOTOR_A_PINS, 3, Constants::INVERT_MOTOR_A);
+DCMotor motorB(Constants::MOTOR_B_PINS, 3, Constants::INVERT_MOTOR_B);
 
 // Define button pins to toggle arms
 // https://forum.arduino.cc/t/using-analog-pins-for-push-buttons/309407/7
-// TODO: Convert the "HOME" button to an Emergency Stop Button
 bool leftArmState = false; // HIGH = false (off eye)
 bool rightArmState = false; // LOW = true (on eye)
-DigitalInput leftButton(headset_config::LEFT_BUTTON, headset_config::BUTTON_PULLUP, headset_config::BUTTON_DEBOUNCE_RISING_MS, headset_config::BUTTON_DEBOUNCE_FALLING_MS); // Verify if there is no pullup resistor
-DigitalInput rightButton(headset_config::RIGHT_BUTTON, headset_config::BUTTON_PULLUP, headset_config::BUTTON_DEBOUNCE_RISING_MS, headset_config::BUTTON_DEBOUNCE_FALLING_MS);
-DigitalInput eStopButton(headset_config::E_STOP_BUTTON, headset_config::BUTTON_PULLUP, headset_config::BUTTON_DEBOUNCE_RISING_MS, headset_config::BUTTON_DEBOUNCE_FALLING_MS); // Likely not needed if stepper is chosen
+DigitalInput leftButton(Constants::LEFT_BUTTON, Constants::BUTTON_PULLUP, Constants::BUTTON_DEBOUNCE_RISING_MS, Constants::BUTTON_DEBOUNCE_FALLING_MS); // Verify if there is no pullup resistor
+DigitalInput rightButton(Constants::RIGHT_BUTTON, Constants::BUTTON_PULLUP, Constants::BUTTON_DEBOUNCE_RISING_MS, Constants::BUTTON_DEBOUNCE_FALLING_MS);
+DigitalInput eStopButton(Constants::E_STOP_BUTTON, Constants::BUTTON_PULLUP, Constants::BUTTON_DEBOUNCE_RISING_MS, Constants::BUTTON_DEBOUNCE_FALLING_MS);
 
 void setLed(bool on) {
   ledState = on;
-  digitalWrite(headset_config::LED_PIN, on ? LOW : HIGH);
+  digitalWrite(Constants::LED_PIN, on ? LOW : HIGH);
 }
 
 // Test Only (for the Bridge and python program)
@@ -65,7 +64,7 @@ int getSensor() {
 
 /* Meant to be called by the bridge*/
 bool getState(int side) {
-  Serial.println("GET STATE CALLED");
+  outputDebugLine("GET STATE CALLED");
   if (side == 1) {
     return rightArmState;
   } else if (side == 0) {
@@ -75,16 +74,20 @@ bool getState(int side) {
   }
 }
 
-// Test Bridge with LED info
-String getStatus() {
+/** 
+ * Test Bridge - Allows web app to perform a simple test to verify successful connection to MCU.
+ * 
+ * @return Arduino's millis(), rounded to the nearest millisecond
+ */
+int getStatus() {
   // For real code, return a Bridge-supported structured type
   // if available, or simple values.
-  return ledState ? "led_on" : "led_off";
+  return (int) millis();
 }
 
 /** Meant to be called by the bridge */
 float getTemp(int side) {
-  Serial.println("GET TEMP CALLED");
+  outputDebugLine("GET TEMP CALLED");
   if (side == 1) {
     return rightThermo.getDegreesFahrenheit();
   } else if (side == 0) {
@@ -99,19 +102,19 @@ void setMode(int mode) {
 }
 
 void setState(int side, bool state) {
-  Serial.println("SET STATE CALLED");
+  outputDebugLine("SET STATE CALLED");
   if (side == 1) {
     rightArmState = state;
   } else if (side == 0) {
     leftArmState = state;
   } else {
-    Serial.println("TRIED TO CALL SETSTATE WITH INVALID SIDE");
+    outputDebugLine("TRIED TO CALL SETSTATE WITH INVALID SIDE");
   }
 }
 
 // Emergency stop
 void stopAll() {
-  Serial.println("EMERGENCY STOP");
+  outputDebugLine("EMERGENCY STOP");
   setLed(true);
   currentMode = 0;
   // Coast Motors
@@ -121,8 +124,8 @@ void stopAll() {
 }
 
 void setup() {
-  pinMode(headset_config::LED_PIN, OUTPUT);
-  digitalWrite(headset_config::LED_PIN, LOW);
+  pinMode(Constants::LED_PIN, OUTPUT);
+  digitalWrite(Constants::LED_PIN, LOW);
   leftThermo.setup();
   rightThermo.setup();
   motorA.begin();

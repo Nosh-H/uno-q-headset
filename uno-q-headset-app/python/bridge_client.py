@@ -37,15 +37,14 @@ class BridgeClient:
         return Bridge.call("getState", side)
 
     def get_mcu_status(self) -> dict:
-        # Keep a stable shape for the web controller while still querying firmware state.
-        return {
-            "connected": True,
-            "status": self.get_status(),
-        }
-
-    def get_status(self) -> str:
-        print("[bridge] getStatus()")
-        return Bridge.call("getStatus")
+        # If the MCU is not connected properly, it'll throw an error - we can catch and return "connected": False
+        try:
+            status = Bridge.call("getStatus")
+            print("[bridge] getStatus() SUCCESS")
+            return {"connected": True, "status": status}
+        except Exception:
+            print("[bridge] getStatus() FAILED")
+            return {"connected": False, "status": None}
 
     def get_sensor(self) -> int:
         print(f"[bridge] getSensor()")
@@ -73,6 +72,3 @@ class BridgeClient:
     def stop_all(self) -> None:
         print("[bridge] stop_all()")
         Bridge.call("stopAll")
-
-    def toggle_state(self) -> None:
-        raise NotImplementedError("toggle_state requires a side-specific bridge command")

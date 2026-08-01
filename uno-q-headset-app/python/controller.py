@@ -38,7 +38,7 @@ class ProjectState:
     right_arm_state: Optional[bool] = None
     left_temp_f: Optional[float] = None
     right_temp_f: Optional[float] = None
-    mcu_status: Optional[str] = None
+    mcu_status: Optional[float] = None
     last_error: Optional[str] = None
     mcu_connected: bool = False
 
@@ -111,7 +111,9 @@ class ProjectController:
                 with self._lock:
                     self.state.sensor_value = sensor
                     self.state.mcu_connected = bool(mcu_status.get("connected"))
-                    self.state.mcu_status = mcu_status.get("status")
+                    # Convert mcu_status.status from milliseconds (int) to seconds (float)
+                    temp_mcu_status = mcu_status.get("status")
+                    self.state.mcu_status = (temp_mcu_status / 1000.0) if (temp_mcu_status != None) else None
                     self.state.left_arm_state = left_arm_state
                     self.state.right_arm_state = right_arm_state
                     self.state.left_temp_f = left_temp_f

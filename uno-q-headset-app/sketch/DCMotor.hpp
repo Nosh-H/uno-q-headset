@@ -14,13 +14,14 @@
  *  
  *  File: DCMotor.hpp
  *  Author: Noah Haskell
- *  Date: 30 July 2026
+ *  Date: 31 July 2026
  *  Decription: A class to control a DC motor with a L293D motor driver. Currently not using an encoder for closed loop control.
  */
 #ifndef DCMOTOR_HPP
 #define DCMOTOR_HPP
 
 #include <Arduino.h>
+#include "Constants.hpp"
 
 /** 
  *  Single-file DCMotor implementation (header + inline methods)
@@ -63,13 +64,14 @@ public:
             pinMode(pinIDs[0], OUTPUT);
         if (pin_count_ > 1)
             pinMode(pinIDs[1], OUTPUT);
-        if (pin_count_ > 2)
+        if (pin_count_ > 2) {
             pinMode(pinIDs[2], OUTPUT);
 
             // Coast motor during startup
             digitalWrite(pinIDs[0], LOW);
             digitalWrite(pinIDs[1], LOW);
             analogWrite(pinIDs[2], 0);
+        }
     }
 
     /**
@@ -124,16 +126,15 @@ public:
         else if (dir == 1)
         {
             // Forward direction
-            Serial.println("--------------------FORWARD");
+            outputDebugLine("--------------------FORWARD");
             digitalWrite(pinIDs[0], HIGH);
             digitalWrite(pinIDs[1], LOW);
             analogWrite(pinIDs[2], pwm);
         }
         else if (dir == -1)
         {
-            // Is something wrong here?
             // Reverse direction
-            Serial.println("--------------------REVERSE");
+            outputDebugLine("--------------------REVERSE");
             digitalWrite(pinIDs[0], LOW);
             digitalWrite(pinIDs[1], HIGH);
             analogWrite(pinIDs[2], pwm);
