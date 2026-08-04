@@ -32,10 +32,20 @@
 
 bool ledState = false;
 int currentMode = 0;
+static volatile bool periodicFlag = false;
+
+static void periodicTimerHandler(struct k_timer *timer_id);
+static K_TIMER_DEFINE(periodicTimer, periodicTimerHandler, NULL);
+
+static void periodicTimerHandler(struct k_timer *timer_id) {
+  (void)timer_id;
+  periodicFlag = true;
+}
 
 // Define Sensors
 Thermometer leftThermo(Constants::ONE_WIRE_BUS_LEFT, Constants::THERMOMETER_PERIOD_MS);
 Thermometer rightThermo(Constants::ONE_WIRE_BUS_RIGHT, Constants::THERMOMETER_PERIOD_MS);
+int periodicCounter = 0;
 
 // Initial target outputs - high {left, right}
 int setpoints[Constants::MOTOR_COUNT] = {Constants::TO_HIGH_POS_OUTPUT, Constants::TO_HIGH_POS_OUTPUT};
@@ -131,6 +141,7 @@ void setup() {
   motorA.begin();
   motorB.begin();
   Serial.begin(9600);
+  k_timer_start(&periodicTimer, K_MSEC(10), K_MSEC(10));
 
   // Register RPC-callable functions here. Template: 
   Bridge.begin();
@@ -176,25 +187,34 @@ void updateSetpoints() {
     motorB.run_motor(1, setpoints[1]);
   }
 
-  // TODO: Delete when Uno Q timer code replaces loop()
-  delay(200);
 }
 
+/**
+ * Time-critcal hardware behavior is here, not in the web app.
+ */
 void periodic() {
-  // Keep time-critical hardware behavior here
-  // Do not depend on web requests for safety-critical timing.
 
-  // Can put thermometer calls into a periodic() called less often
-  leftThermo.periodic();
-  rightThermo.periodic();
+  // Can call thermometer periodic less often (200ms)
+  if (periodicCounter >= 20) {
+    periodicCounter = 0;
+    leftThermo.periodic();
+    rightThermo.periodic();
+  }
 
   // Check buttons and update state as necessary
-  checkButtons();
+  if (periodicCounter % 10 = 0) {
+    checkButtons();
+  }
+  periodicCounter++;
+
   // Apply motor output based on arm states
   updateSetpoints();
 
 }
 
 void loop() {
-  periodic();
+  if (periodicFlag) {
+    periodicFlag = false;
+    periodic();
+  }
 }

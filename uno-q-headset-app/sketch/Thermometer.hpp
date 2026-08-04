@@ -63,6 +63,9 @@ private:
 
 Thermometer::Thermometer(uint8_t pin, double period)
     : period(period), oneWire(pin), thermometer(&oneWire) {
+    if (this->period < 750.0) {
+        this->period = 750.0;
+    }
 }
 
 void Thermometer::setup() {
