@@ -3791,6 +3791,16 @@
 		)
 		(uuid "35bc5b35-b7b2-44d5-bbed-557f428649b2")
 	)
+	(label "PWM_1"
+		(at 62.23 64.77 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "38b219c8-9981-4d23-8e3a-b86be0c2fc23")
+	)
 	(label "12"
 		(at 74.93 39.37 180)
 		(effects
@@ -4050,6 +4060,16 @@
 			(justify left bottom)
 		)
 		(uuid "df0495fd-9769-475d-ad18-0778d2f43f78")
+	)
+	(label "PWM_2"
+		(at 62.23 62.23 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "df21b350-ef4c-491d-a458-e57a1ac421c7")
 	)
 	(label "SDA{slash}A4"
 		(at 17.78 69.85 0)
