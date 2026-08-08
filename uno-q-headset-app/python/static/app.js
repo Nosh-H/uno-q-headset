@@ -82,6 +82,11 @@ async function stopAll() {
   await refreshStatus();
 }
 
+async function resumeAll() {
+  await api("/api/resume", { method: "POST"});
+  await refreshStatus();
+}
+
 function wireControls() {
   const ledSwitch = document.querySelector(".switch input[type='checkbox']");
   ledSwitch.addEventListener("change", () => setLed(ledSwitch.checked));
@@ -97,6 +102,10 @@ function wireControls() {
   document.querySelectorAll("[data-action='stop']").forEach((button) => {
     button.addEventListener("click", stopAll);
   });
+
+  document.querySelectorAll("[data-action='resume']").forEach((button) => {
+    button.addEventListener("click", resumeAll);
+  });
 }
 
 window.headsetApi = {
@@ -106,6 +115,7 @@ window.headsetApi = {
   setMode,
   setState,
   stopAll,
+  resumeAll,
   refreshStatus,
 };
 

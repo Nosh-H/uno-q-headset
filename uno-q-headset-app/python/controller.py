@@ -185,3 +185,11 @@ class ProjectController:
             self.state.mode = 0
 
         return self.get_status()
+
+    def end_emergency_stop(self) -> dict:
+        self.bridge.resume_all()
+
+        with self._lock:
+            self.state.led_on = True
+
+        return self.get_status()

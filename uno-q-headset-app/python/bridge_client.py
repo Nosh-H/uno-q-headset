@@ -70,5 +70,9 @@ class BridgeClient:
         Bridge.call("setState", side, on)
 
     def stop_all(self) -> None:
-        print("[bridge] stop_all()")
+        print("[bridge] stopAll()")
         Bridge.call("stopAll")
+
+    def resume_all(self) -> None:
+        print("[bridge] resumeAll()")
+        Bridge.call("resumeAll")

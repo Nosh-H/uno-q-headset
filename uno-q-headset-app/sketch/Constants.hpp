@@ -50,8 +50,8 @@ constexpr uint8_t MOTOR_COUNT = 2;
 constexpr bool INVERT_MOTOR_A = false;
 constexpr bool INVERT_MOTOR_B = false;
 
-constexpr int TO_HIGH_POS_OUTPUT = 200;
-constexpr int TO_LOW_POS_OUTPUT = 200;
+constexpr int TO_HIGH_POS_OUTPUT = 255;
+constexpr int TO_LOW_POS_OUTPUT = 255;
 
 constexpr uint8_t LEFT_BUTTON = A0;
 constexpr uint8_t RIGHT_BUTTON = A1;

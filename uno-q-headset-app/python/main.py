@@ -128,6 +128,13 @@ def stop_all():
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc))
 
+@app.post("/api/resume")
+def resume_all():
+    try:
+        return controller.end_emergency_stop()
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc));
+
 # 4. Start the server (Crucial step to prevent exit code 0)
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)

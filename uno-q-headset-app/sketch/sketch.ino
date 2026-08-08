@@ -51,6 +51,7 @@ bool rightArmState = false; // LOW = true (on eye)
 DigitalInput leftButton(Constants::LEFT_BUTTON, Constants::BUTTON_PULLUP, Constants::BUTTON_DEBOUNCE_RISING_MS, Constants::BUTTON_DEBOUNCE_FALLING_MS); // Verify if there is no pullup resistor
 DigitalInput rightButton(Constants::RIGHT_BUTTON, Constants::BUTTON_PULLUP, Constants::BUTTON_DEBOUNCE_RISING_MS, Constants::BUTTON_DEBOUNCE_FALLING_MS);
 DigitalInput eStopButton(Constants::E_STOP_BUTTON, Constants::BUTTON_PULLUP, Constants::BUTTON_DEBOUNCE_RISING_MS, Constants::BUTTON_DEBOUNCE_FALLING_MS);
+bool eStopEnabled = false;
 
 void setLed(bool on) {
   ledState = on;
@@ -120,7 +121,14 @@ void stopAll() {
   // Coast Motors
   motorA.run_motor(0, 0);
   motorB.run_motor(0, 0);
+  eStopEnabled = true;
+}
 
+// End emergency stop
+void resumeAll() {
+  outputDebugLine("DISABLE EMERGENCY STOP");
+  setLed(false);
+  eStopEnabled = false;
 }
 
 void setup() {
@@ -130,6 +138,9 @@ void setup() {
   rightThermo.setup();
   motorA.begin();
   motorB.begin();
+  leftButton.setup();
+  rightButton.setup();
+  eStopButton.setup();
   Serial.begin(9600);
 
   // Register RPC-callable functions here. Template: 
@@ -142,9 +153,14 @@ void setup() {
   Bridge.provide("setMode", setMode);
   Bridge.provide("setState", setState);
   Bridge.provide("stopAll", stopAll);
+  Bridge.provide("resumeAll", resumeAll);
 }
 
 void checkButtons() {
+  leftButton.periodic();
+  rightButton.periodic();
+  eStopButton.periodic();
+
   if (leftButton.onRisingEdge()) {
     // If the button was just pressed, toggle the matching arm state
     leftArmState = !leftArmState;
@@ -155,9 +171,13 @@ void checkButtons() {
     rightArmState = !rightArmState;
   }
   
-  // Emergency stop
+  // Emergency stop toggle
   if (eStopButton.onRisingEdge()) {
-    stopAll();
+    if (eStopEnabled) {
+      resumeAll();
+    } else {
+      stopAll();
+    }
   }
 }
 
@@ -191,7 +211,9 @@ void periodic() {
   // Check buttons and update state as necessary
   checkButtons();
   // Apply motor output based on arm states
-  updateSetpoints();
+  if (!eStopEnabled) {
+    updateSetpoints();
+  }
 
 }
 

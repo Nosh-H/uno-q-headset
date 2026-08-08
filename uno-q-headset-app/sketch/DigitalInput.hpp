@@ -73,7 +73,7 @@ private:
     TimeDebounce debounce;
 };
 
-// Construct debouncers with reasonable defaults: short tap and long hold
+// Construct debouncers with user-set values
 DigitalInput::DigitalInput(uint8_t receiverPin, bool pullup, uint16_t debounceRising, uint16_t debounceFalling)
     : receiverPin(receiverPin), pullup(pullup), state(0), debounce(debounceRising, debounceFalling) {
 }
@@ -92,7 +92,7 @@ bool DigitalInput::get() {
 }
 
 bool DigitalInput::getDebounced() {
-    // Return the short-tap debounced reading by default
+    // Return the debounced reading
     return debounce.read();
 }
 
