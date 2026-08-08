@@ -1,6 +1,6 @@
-# Uno Q Headset
+# The Headset - Uno Q Version
 
-Uno Q Headset is a prototype control system for a wearable headset built around an Arduino Uno Q and a Python web app. The goal is to coordinate physical hardware behavior on the microcontroller with remote control from a browser over the local network, in order to automate the application of a cold compress on the wearer's eyes for the goal of treating eye itching and pain caused by allergies.
+The Headset (Uno Q Version) is a prototype control system for a wearable headset built around an Arduino Uno Q and a Python web app. The goal is to coordinate physical hardware behavior on the microcontroller with remote control from a browser over the local network, in order to automate the application of a cold compress on the wearer's eyes for the goal of treating eye itching and pain caused by allergies.
 
 This repository currently contains two main parts:
 
@@ -62,7 +62,7 @@ The supporting C++ files reinforce that split:
 
 This way, the firmware can keep safety-sensitive behavior local to the microcontroller and avoid relying on web requests for timing.
 
-Motor control is still in progress, but the architecture already points toward the intended structure: `sketch.ino` computes desired setpoints from the current arm state, and the lower-level motion implementation is expected to consume those setpoints once it is fully wired up.
+Motor control is still in progress, but the architecture already has the intended structure: main.cpp computes desired setpoints from the current arm state, and the lower-level DCMotor.hpp consumes those setpoints once it is fully wired up.
 
 ## Working On The Codebase
 

@@ -81,8 +81,6 @@ bool getState(int side) {
  * @return Arduino's millis(), rounded to the nearest millisecond
  */
 int getStatus() {
-  // For real code, return a Bridge-supported structured type
-  // if available, or simple values.
   return (int) millis();
 }
 
@@ -197,7 +195,7 @@ void updateSetpoints() {
   }
 
   // TODO: Delete when Uno Q timer code replaces loop()
-  delay(200);
+  delay(500);
 }
 
 void periodic() {

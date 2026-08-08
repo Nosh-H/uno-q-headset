@@ -37,13 +37,12 @@ namespace Constants {
 
 constexpr uint8_t LED_PIN = LED_BUILTIN;
 
-constexpr uint8_t ONE_WIRE_BUS_LEFT = 4;
-constexpr uint8_t ONE_WIRE_BUS_RIGHT = 10;
+constexpr uint8_t ONE_WIRE_BUS_LEFT = 9;
+constexpr uint8_t ONE_WIRE_BUS_RIGHT = 12;
 constexpr double THERMOMETER_PERIOD_MS = 1000.0;
 
-// NO LONGER USING PIN 10 FOR DIRECTION - TESTED TO NOT WORK (likely due to thermometer pin conflict)
-const int MOTOR_A_PINS[3] = {8, 9, 5};
-const int MOTOR_B_PINS[3] = {11, 12, 6};
+const int MOTOR_A_PINS[3] = {7, 8, 5};
+const int MOTOR_B_PINS[3] = {10, 11, 6};
 
 constexpr uint8_t MOTOR_COUNT = 2;
 
@@ -53,9 +52,9 @@ constexpr bool INVERT_MOTOR_B = false;
 constexpr int TO_HIGH_POS_OUTPUT = 255;
 constexpr int TO_LOW_POS_OUTPUT = 255;
 
-constexpr uint8_t LEFT_BUTTON = A0;
-constexpr uint8_t RIGHT_BUTTON = A1;
-constexpr uint8_t E_STOP_BUTTON = A2;
+constexpr uint8_t LEFT_BUTTON = A2;
+constexpr uint8_t RIGHT_BUTTON = A3;
+constexpr uint8_t E_STOP_BUTTON = A4;
 constexpr bool BUTTON_PULLUP = false;
 constexpr uint16_t BUTTON_DEBOUNCE_RISING_MS = 50;
 constexpr uint16_t BUTTON_DEBOUNCE_FALLING_MS = 50;

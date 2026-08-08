@@ -3253,16 +3253,6 @@
 	)
 	(wire
 		(pts
-			(xy 62.23 39.37) (xy 74.93 39.37)
-		)
-		(stroke
-			(width 0)
-			(type solid)
-		)
-		(uuid "4a910b57-a5cd-4105-ab4f-bde2a80d4f00")
-	)
-	(wire
-		(pts
 			(xy 215.265 31.75) (xy 202.565 31.75)
 		)
 		(stroke
@@ -3320,16 +3310,6 @@
 			(type default)
 		)
 		(uuid "5cc30608-3908-4e4e-8d37-103d5fc50717")
-	)
-	(wire
-		(pts
-			(xy 62.23 46.99) (xy 74.93 46.99)
-		)
-		(stroke
-			(width 0)
-			(type solid)
-		)
-		(uuid "63f2b71b-521b-4210-bf06-ed65e330fccc")
 	)
 	(wire
 		(pts
@@ -3403,6 +3383,16 @@
 	)
 	(wire
 		(pts
+			(xy 62.23 39.37) (xy 75.565 39.37)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "818cc355-9061-4efc-aeb6-dad504bddbfb")
+	)
+	(wire
+		(pts
 			(xy 155.575 42.545) (xy 149.225 42.545)
 		)
 		(stroke
@@ -3453,7 +3443,7 @@
 	)
 	(wire
 		(pts
-			(xy 34.29 64.77) (xy 21.59 64.77)
+			(xy 21.59 64.77) (xy 34.29 64.77)
 		)
 		(stroke
 			(width 0)
@@ -3673,6 +3663,16 @@
 	)
 	(wire
 		(pts
+			(xy 62.23 46.99) (xy 75.565 46.99)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "eec83b3b-ce94-499c-93b5-4f9ad06748b5")
+	)
+	(wire
+		(pts
 			(xy 62.23 74.93) (xy 74.93 74.93)
 		)
 		(stroke
@@ -3683,7 +3683,7 @@
 	)
 	(wire
 		(pts
-			(xy 34.29 69.85) (xy 21.59 69.85)
+			(xy 17.78 69.85) (xy 34.29 69.85)
 		)
 		(stroke
 			(width 0)
@@ -3731,6 +3731,16 @@
 		)
 		(uuid "0d8cfe6d-11bf-42b9-9752-f9a5a76bce7e")
 	)
+	(label "ONEWIRE_DATA_1"
+		(at 75.565 46.99 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "150170a3-f1ad-4d19-a603-06899dc96416")
+	)
 	(label "2"
 		(at 74.93 72.39 180)
 		(effects
@@ -3740,6 +3750,16 @@
 			(justify right bottom)
 		)
 		(uuid "23f0c933-49f0-4410-a8db-8b017f48dadc")
+	)
+	(label "ONEWIRE_DATA_2"
+		(at 75.565 39.37 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "284fa8d6-5c60-485e-931c-c3d7ff6255c7")
 	)
 	(label "A3"
 		(at 21.59 67.31 0)
@@ -3791,6 +3811,16 @@
 		)
 		(uuid "49585dba-cfa7-4813-841e-9d900d43ecf4")
 	)
+	(label "BUTTON_2"
+		(at 26.035 67.31 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "4a93bf2d-28e8-4795-9bb9-4565c720ffe2")
+	)
 	(label "*10"
 		(at 74.93 44.45 180)
 		(effects
@@ -3810,6 +3840,26 @@
 			(justify left bottom)
 		)
 		(uuid "64959c13-513a-49c5-99b3-aea923689dbc")
+	)
+	(label "BUTTON_3"
+		(at 25.4 69.85 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "6b606f75-dbea-4c79-b5da-d8017c3732cb")
+	)
+	(label "BUTTON_1"
+		(at 25.4 64.77 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "744f35f5-3793-43e3-868a-14a417090f8a")
 	)
 	(label "PWM_1"
 		(at 112.395 47.625 0)
@@ -4002,7 +4052,7 @@
 		(uuid "df0495fd-9769-475d-ad18-0778d2f43f78")
 	)
 	(label "SDA{slash}A4"
-		(at 21.59 69.85 0)
+		(at 17.78 69.85 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -5131,7 +5181,7 @@
 			)
 		)
 		(pin "1"
-			(uuid "7b1a5f15-0423-48c1-9f5a-1416342d3643")
+			(uuid "7b1a5f15-0423-48c1-9f5a-1416342d3644")
 		)
 		(instances
 			(project "uno_q_headset_shield"
@@ -5528,7 +5578,7 @@
 			)
 		)
 		(pin "1"
-			(uuid "7b1a5f15-0423-48c1-9f5a-1416342d3643")
+			(uuid "7b1a5f15-0423-48c1-9f5a-1416342d3645")
 		)
 		(instances
 			(project "uno_q_headset_shield"
@@ -5844,7 +5894,7 @@
 			)
 		)
 		(pin "1"
-			(uuid "18ea14f6-2288-4054-a505-af284c6347cf")
+			(uuid "18ea14f6-2288-4054-a505-af284c6347d0")
 		)
 		(instances
 			(project "uno_q_headset_shield"
@@ -6003,7 +6053,7 @@
 			)
 		)
 		(pin "1"
-			(uuid "1184ef33-94b3-4b01-b7d4-9dd903d54e21")
+			(uuid "1184ef33-94b3-4b01-b7d4-9dd903d54e22")
 		)
 		(instances
 			(project "uno_q_headset_shield"
@@ -6160,7 +6210,7 @@
 			)
 		)
 		(pin "1"
-			(uuid "1184ef33-94b3-4b01-b7d4-9dd903d54e21")
+			(uuid "1184ef33-94b3-4b01-b7d4-9dd903d54e23")
 		)
 		(instances
 			(project "uno_q_headset_shield"
@@ -6600,7 +6650,7 @@
 			)
 		)
 		(pin "1"
-			(uuid "7b1a5f15-0423-48c1-9f5a-1416342d3643")
+			(uuid "7b1a5f15-0423-48c1-9f5a-1416342d3646")
 		)
 		(instances
 			(project "uno_q_headset_shield"
@@ -6763,7 +6813,7 @@
 			)
 		)
 		(pin "1"
-			(uuid "7b1a5f15-0423-48c1-9f5a-1416342d3643")
+			(uuid "7b1a5f15-0423-48c1-9f5a-1416342d3647")
 		)
 		(instances
 			(project "uno_q_headset_shield"
@@ -7157,7 +7207,7 @@
 			)
 		)
 		(pin "1"
-			(uuid "7b1a5f15-0423-48c1-9f5a-1416342d3643")
+			(uuid "7b1a5f15-0423-48c1-9f5a-1416342d3648")
 		)
 		(instances
 			(project "uno_q_headset_shield"
