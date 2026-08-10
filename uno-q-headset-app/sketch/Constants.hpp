@@ -40,9 +40,9 @@ constexpr uint8_t LED_PIN = LED_BUILTIN;
 constexpr uint8_t ONE_WIRE_BUS_LEFT = 9;
 constexpr uint8_t ONE_WIRE_BUS_RIGHT = 12;
 constexpr double THERMOMETER_PERIOD_MS = 1000.0;
-
-const int MOTOR_A_PINS[3] = {7, 8, 5};
-const int MOTOR_B_PINS[3] = {10, 11, 6};
+// pwm 3, 5, 6, 9, 10, 11 options
+const int MOTOR_A_PINS[4] = {3, 5, A0, 7};
+const int MOTOR_B_PINS[4] = {6, 10, A1, 11};
 
 constexpr uint8_t MOTOR_COUNT = 2;
 

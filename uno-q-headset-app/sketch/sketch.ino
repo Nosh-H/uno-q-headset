@@ -23,7 +23,7 @@
 #include <Arduino_RouterBridge.h>
 // #include <util/atomic.h>
 #include <DallasTemperature.h>
-#include "DCMotor.hpp"
+#include "DRV8874.hpp"
 #include "DigitalInput.hpp"
 #include "Constants.hpp"
 #include <OneWire.h>
@@ -40,9 +40,9 @@ Thermometer rightThermo(Constants::ONE_WIRE_BUS_RIGHT, Constants::THERMOMETER_PE
 // Initial target outputs - high {left, right}
 int setpoints[Constants::MOTOR_COUNT] = {Constants::TO_HIGH_POS_OUTPUT, Constants::TO_HIGH_POS_OUTPUT};
 
-// Global DCMotor instances: safe because constructor does not call Arduino APIs.
-DCMotor motorA(Constants::MOTOR_A_PINS, 3, Constants::INVERT_MOTOR_A);
-DCMotor motorB(Constants::MOTOR_B_PINS, 3, Constants::INVERT_MOTOR_B);
+// Global DRV8874 instances: safe because constructor does not call Arduino APIs. Set to PWM control mode.
+DRV8874 motorA(Constants::MOTOR_A_PINS, 4, Constants::INVERT_MOTOR_A, true);
+DRV8874 motorB(Constants::MOTOR_B_PINS, 4, Constants::INVERT_MOTOR_B, true);
 
 // Define button pins to toggle arms
 // https://forum.arduino.cc/t/using-analog-pins-for-push-buttons/309407/7
@@ -117,8 +117,8 @@ void stopAll() {
   setLed(true);
   currentMode = 0;
   // Coast Motors
-  motorA.run_motor(0, 0);
-  motorB.run_motor(0, 0);
+  motorA.runMotor(0, 0);
+  motorB.runMotor(0, 0);
   eStopEnabled = true;
 }
 
@@ -130,12 +130,15 @@ void resumeAll() {
 }
 
 void setup() {
+  // Begin motors and set a "default" output
+  motorA.begin();
+  motorB.begin();
+  motorA.setOutput(setpoints[0]);
+  motorB.setOutput(setpoints[1]);
   pinMode(Constants::LED_PIN, OUTPUT);
   digitalWrite(Constants::LED_PIN, LOW);
   leftThermo.setup();
   rightThermo.setup();
-  motorA.begin();
-  motorB.begin();
   leftButton.setup();
   rightButton.setup();
   eStopButton.setup();
@@ -183,15 +186,15 @@ void checkButtons() {
 void updateSetpoints() {
   
   if (leftArmState) {
-    motorA.run_motor(-1, setpoints[0]);
+    motorA.runMotor(-1, setpoints[0]);
   } else {
-    motorA.run_motor(1, setpoints[0]);
+    motorA.runMotor(1, setpoints[0]);
   }
   
   if (rightArmState) {
-    motorB.run_motor(-1, setpoints[1]);
+    motorB.runMotor(-1, setpoints[1]);
   } else {
-    motorB.run_motor(1, setpoints[1]);
+    motorB.runMotor(1, setpoints[1]);
   }
 
   // TODO: Delete when Uno Q timer code replaces loop()
