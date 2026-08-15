@@ -41,8 +41,10 @@ constexpr uint8_t ONE_WIRE_BUS_LEFT = 9;
 constexpr uint8_t ONE_WIRE_BUS_RIGHT = 12;
 constexpr double THERMOMETER_PERIOD_MS = 1000.0;
 // pwm 3, 5, 6, 9, 10, 11 options
-const int MOTOR_A_PINS[4] = {3, 5, A0, 7};
-const int MOTOR_B_PINS[4] = {6, 10, A1, 11};
+// [controlPin1, controlPin2, currentPin, sleepPin, faultPin] in that order.
+// sleepPin and faultPin are shared. Fault pin reading is not implemented yet.
+const int MOTOR_A_PINS[5] = {3, 5, A0, 4, 11};
+const int MOTOR_B_PINS[3] = {6, 10, A1};
 
 constexpr uint8_t MOTOR_COUNT = 2;
 

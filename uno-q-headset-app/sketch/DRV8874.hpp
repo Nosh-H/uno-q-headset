@@ -135,26 +135,38 @@ public:
             // Coast
             analogWrite(pinIDs[0], 0);
             analogWrite(pinIDs[1], 0);
+            state = 2;
         }
-        else if (dir == 1) // TODO: finish
-        {
-            // Forward direction
-            outputDebugLine("--------------------FORWARD");
-            analogWrite(pinIDs[0], pwm);
-            analogWrite(pinIDs[1], 0);
-        }
-        else if (dir == -1)
-        {
-            // Reverse direction
-            outputDebugLine("--------------------REVERSE");
-            analogWrite(pinIDs[0], 0);
-            analogWrite(pinIDs[1], pwm);
-        }
-        else
-        {
-            // Brake motor - pwm probably shouldn't be max as that wastes power to heat
-            analogWrite(pinIDs[0], pwm);
-            analogWrite(pinIDs[1], pwm);
+        else {
+            // If goal output is NOT coasting, we need to coast first
+            int newState = dir;
+            if (state != newState) {
+              // Coast first
+              analogWrite(pinIDs[0], 0);
+              analogWrite(pinIDs[1], 0);
+              state = newState;
+              return;
+            }
+            if (dir == 1)
+            {
+                // Forward direction
+                outputDebugLine("--------------------FORWARD");
+                analogWrite(pinIDs[0], pwm);
+                analogWrite(pinIDs[1], 0);
+            }
+            else if (dir == -1)
+            {
+                // Reverse direction
+                outputDebugLine("--------------------REVERSE");
+                analogWrite(pinIDs[0], 0);
+                analogWrite(pinIDs[1], pwm);
+            }
+            else
+            {
+                // Brake motor - pwm probably shouldn't be max as that wastes power to heat
+                analogWrite(pinIDs[0], pwm);
+                analogWrite(pinIDs[1], pwm);
+            }
         }
     }
 
@@ -277,6 +289,7 @@ private:
     int output; // Preset output, from 0 to 255
     bool invert;
     bool mode;
+    int state = 2; // -1, 0, 1, 2  reverse, brake, forward, coast
     
     // Vref sets the current threshold at which the DRV8874 begins regulating the current
     double Vref = 3.3;

@@ -198,7 +198,7 @@ void updateSetpoints() {
   }
 
   // TODO: Delete when Uno Q timer code replaces loop()
-  delay(20);
+  delay(650);
 }
 
 void periodic() {
