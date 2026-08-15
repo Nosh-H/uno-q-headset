@@ -1,0 +1,64 @@
+Info: Processing symbol 'J1:Connector_PinSocket_2.54mm:PinSocket_1x08_P2.54mm_Vertical'.
+Info: Processing symbol 'JP1:Jumper:SolderJumper-3_P2.0mm_Open_TrianglePad1.0x1.5mm_NumberLabels'.
+Info: Processing symbol 'J6:TerminalBlock_Phoenix:TerminalBlock_Phoenix_MKDS-1,5-2-5.08_1x02_P5.08mm_Horizontal'.
+Info: Processing symbol 'J3:Connector_PinSocket_2.54mm:PinSocket_1x06_P2.54mm_Vertical'.
+Info: Processing symbol 'J5:TerminalBlock_Phoenix:TerminalBlock_Phoenix_MKDS-1,5-2-5.08_1x02_P5.08mm_Horizontal'.
+Info: Processing symbol 'J4:Connector_PinSocket_2.54mm:PinSocket_1x08_P2.54mm_Vertical'.
+Info: Processing symbol 'J2:Connector_PinSocket_2.54mm:PinSocket_1x10_P2.54mm_Vertical'.
+Info: Processing symbol 'J7:TerminalBlock_Phoenix:TerminalBlock_Phoenix_MKDS-1,5-3-5.08_1x03_P5.08mm_Horizontal'.
+Info: Processing symbol 'J8:TerminalBlock_Phoenix:TerminalBlock_Phoenix_MKDS-1,5-3-5.08_1x03_P5.08mm_Horizontal'.
+Info: Processing symbol 'J9:TerminalBlock_Phoenix:TerminalBlock_Phoenix_MKDS-1,5-3-5.08_1x03_P5.08mm_Horizontal'.
+Info: Processing symbol 'JP2:Jumper:SolderJumper-3_P2.0mm_Open_TrianglePad1.0x1.5mm_NumberLabels'.
+Info: Processing symbol 'R1:Resistor_SMD:R_1206_3216Metric_Pad1.30x1.75mm_HandSolder'.
+Info: Processing symbol 'R2:Resistor_SMD:R_1206_3216Metric_Pad1.30x1.75mm_HandSolder'.
+Info: Processing symbol 'R3:Resistor_SMD:R_1206_3216Metric_Pad1.30x1.75mm_HandSolder'.
+Info: Processing symbol 'SW2:Button_Switch_SMD:SW_Push_1P1T_NO_CK_KSC6xxJ'.
+Info: Processing symbol 'R4:Resistor_SMD:R_1206_3216Metric_Pad1.30x1.75mm_HandSolder'.
+Info: Processing symbol 'R5:Resistor_SMD:R_1206_3216Metric_Pad1.30x1.75mm_HandSolder'.
+Info: Processing symbol 'SW1:Button_Switch_SMD:SW_Push_1P1T_NO_CK_KSC6xxJ'.
+Info: Processing symbol 'SW3:Button_Switch_SMD:SW_Push_1P1T_NO_CK_KSC6xxJ'.
+Info: Processing symbol 'U1:DRV887X_Carrier:DRV887X_Carrier'.
+Info: Processing symbol 'U2:DRV887X_Carrier:DRV887X_Carrier'.
+Update J2 unit metadata.
+Update J3 fields.
+Update J3 sheetfile to 'uno_q_headset_shield.kicad_sch'.
+Reconnect J3 pin 5 from /SDA/A4 to /BUTTON_3.
+Update J3 unit metadata.
+Update J4 fields.
+Update J4 sheetfile to 'uno_q_headset_shield.kicad_sch'.
+Update J4 unit metadata.
+Add J5 (footprint 'TerminalBlock_Phoenix:TerminalBlock_Phoenix_MKDS-1,5-2-5.08_1x02_P5.08mm_Horizontal').
+Add net +3V3_UNO.
+Update J1 fields.
+Add J7 (footprint 'TerminalBlock_Phoenix:TerminalBlock_Phoenix_MKDS-1,5-3-5.08_1x03_P5.08mm_Horizontal').
+Update J1 sheetfile to 'uno_q_headset_shield.kicad_sch'.
+Add J8 (footprint 'TerminalBlock_Phoenix:TerminalBlock_Phoenix_MKDS-1,5-3-5.08_1x03_P5.08mm_Horizontal').
+Add net unconnected-(J1-Pin_2-Pad2).
+Add J9 (footprint 'TerminalBlock_Phoenix:TerminalBlock_Phoenix_MKDS-1,5-3-5.08_1x03_P5.08mm_Horizontal').
+Add J6 (footprint 'TerminalBlock_Phoenix:TerminalBlock_Phoenix_MKDS-1,5-2-5.08_1x02_P5.08mm_Horizontal').
+Add JP1 (footprint 'Jumper:SolderJumper-3_P2.0mm_Open_TrianglePad1.0x1.5mm_NumberLabels').
+Reconnect J1 pin 2 from /IOREF to unconnected-(J1-Pin_2-Pad2).
+Add JP2 (footprint 'Jumper:SolderJumper-3_P2.0mm_Open_TrianglePad1.0x1.5mm_NumberLabels').
+Add net +5V_UNO.
+Add R1 (footprint 'Resistor_SMD:R_1206_3216Metric_Pad1.30x1.75mm_HandSolder').
+Reconnect J1 pin 5 from +5V to +5V_UNO.
+Add R2 (footprint 'Resistor_SMD:R_1206_3216Metric_Pad1.30x1.75mm_HandSolder').
+Reconnect J1 pin 4 from +3V3 to +3V3_UNO.
+Add net VBAT_1.
+Reconnect J1 pin 8 from VCC to VBAT_1.
+Add R4 (footprint 'Resistor_SMD:R_1206_3216Metric_Pad1.30x1.75mm_HandSolder').
+Update J1 unit metadata.
+Add R5 (footprint 'Resistor_SMD:R_1206_3216Metric_Pad1.30x1.75mm_HandSolder').
+Update J2 fields.
+Add SW1 (footprint 'Button_Switch_SMD:SW_Push_1P1T_NO_CK_KSC6xxJ').
+Add R3 (footprint 'Resistor_SMD:R_1206_3216Metric_Pad1.30x1.75mm_HandSolder').
+Add SW2 (footprint 'Button_Switch_SMD:SW_Push_1P1T_NO_CK_KSC6xxJ').
+Update J2 sheetfile to 'uno_q_headset_shield.kicad_sch'.
+Add SW3 (footprint 'Button_Switch_SMD:SW_Push_1P1T_NO_CK_KSC6xxJ').
+Add net /BUTTON_3.
+Add U1 (footprint 'DRV887X_Carrier:DRV887X_Carrier').
+Reconnect J2 pin 2 from /SDA/A4 to /BUTTON_3.
+Add U2 (footprint 'DRV887X_Carrier:DRV887X_Carrier').
+
+
+Info: Total warnings: 0, errors: 0.

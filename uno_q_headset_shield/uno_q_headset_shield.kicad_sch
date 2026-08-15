@@ -5117,7 +5117,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "DRV887X_Carrier:DRV887X_Carrier"
 			(at 132.715 41.275 0)
 			(hide yes)
 			(show_name no)
@@ -5235,7 +5235,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_1206_3216Metric_Pad1.30x1.75mm_HandSolder"
 			(at 269.367 80.01 90)
 			(hide yes)
 			(show_name no)
@@ -5395,7 +5395,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "TerminalBlock_Phoenix:TerminalBlock_Phoenix_MKDS-1,5-3-5.08_1x03_P5.08mm_Horizontal"
 			(at 220.345 31.75 0)
 			(hide yes)
 			(show_name no)
@@ -5869,7 +5869,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "TerminalBlock_Phoenix:TerminalBlock_Phoenix_MKDS-1,5-2-5.08_1x02_P5.08mm_Horizontal"
 			(at 160.655 38.735 0)
 			(hide yes)
 			(show_name no)
@@ -5949,7 +5949,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_1206_3216Metric_Pad1.30x1.75mm_HandSolder"
 			(at 206.375 30.988 90)
 			(hide yes)
 			(show_name no)
@@ -6028,7 +6028,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Button_Switch_SMD:SW_Push_1P1T_NO_CK_KSC6xxJ"
 			(at 260.35 46.99 0)
 			(hide yes)
 			(show_name no)
@@ -6143,7 +6143,7 @@
 			)
 		)
 		(pin "1"
-			(uuid "0a6abc73-2c19-456d-b71b-02d7d786a7ff")
+			(uuid "0a6abc73-2c19-456d-b71b-02d7d786a800")
 		)
 		(instances
 			(project "uno_q_headset_shield"
@@ -6652,7 +6652,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Button_Switch_SMD:SW_Push_1P1T_NO_CK_KSC6xxJ"
 			(at 260.35 21.59 0)
 			(hide yes)
 			(show_name no)
@@ -6734,7 +6734,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "TerminalBlock_Phoenix:TerminalBlock_Phoenix_MKDS-1,5-3-5.08_1x03_P5.08mm_Horizontal"
 			(at 221.615 81.915 0)
 			(hide yes)
 			(show_name no)
@@ -6896,7 +6896,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "TerminalBlock_Phoenix:TerminalBlock_Phoenix_MKDS-1,5-2-5.08_1x02_P5.08mm_Horizontal"
 			(at 160.02 86.995 0)
 			(hide yes)
 			(show_name no)
@@ -7053,7 +7053,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Button_Switch_SMD:SW_Push_1P1T_NO_CK_KSC6xxJ"
 			(at 260.985 71.12 0)
 			(hide yes)
 			(show_name no)
@@ -7290,7 +7290,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_1206_3216Metric_Pad1.30x1.75mm_HandSolder"
 			(at 269.367 55.88 90)
 			(hide yes)
 			(show_name no)
@@ -7525,7 +7525,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "DRV887X_Carrier:DRV887X_Carrier"
 			(at 132.715 90.805 0)
 			(hide yes)
 			(show_name no)
@@ -7721,7 +7721,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "TerminalBlock_Phoenix:TerminalBlock_Phoenix_MKDS-1,5-3-5.08_1x03_P5.08mm_Horizontal"
 			(at 220.345 52.07 0)
 			(hide yes)
 			(show_name no)
@@ -7882,7 +7882,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_1206_3216Metric_Pad1.30x1.75mm_HandSolder"
 			(at 205.74 51.308 90)
 			(hide yes)
 			(show_name no)
@@ -8039,7 +8039,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Jumper:SolderJumper-3_P2.0mm_Open_TrianglePad1.0x1.5mm_NumberLabels"
 			(at 97.155 65.405 0)
 			(hide yes)
 			(show_name no)
@@ -8223,7 +8223,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_1206_3216Metric_Pad1.30x1.75mm_HandSolder"
 			(at 268.732 30.48 90)
 			(hide yes)
 			(show_name no)
@@ -8381,7 +8381,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Jumper:SolderJumper-3_P2.0mm_Open_TrianglePad1.0x1.5mm_NumberLabels"
 			(at 96.52 116.84 0)
 			(hide yes)
 			(show_name no)
