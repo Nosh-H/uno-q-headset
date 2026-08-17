@@ -14,7 +14,7 @@
  *  
  *  File: DRV8874.hpp
  *  Author: Noah Haskell
- *  Date: 9 August 2026
+ *  Date: 16 August 2026
  *  Decription: A class to control one DC motor with a DRV8874 motor driver. Currently only supporting PWM control mode. Planned to implement current sensing, may implement PHEN.
  *  Sources: https://github.com/szolotykh/DRV8874-breakout-board, https://www.ti.com/lit/ds/symlink/drv8874.pdf, https://www.pololu.com/product/4035
  */
@@ -88,6 +88,7 @@ public:
             // Sleep pin - set to high (3.3V on the Uno Q)
             digitalWrite(pinIDs[3], HIGH);
         }
+        cycleStartTime = millis();
     }
 
     /**
@@ -107,6 +108,95 @@ public:
             pinIDs = nullptr;
         }
     }
+
+    /**
+     *  @brief Function to set the motor into brake mode.(PWM)
+     */
+    void brake() {
+        if(mode) {
+            // Brake motor - pwm probably shouldn't be max as that wastes power to heat, but must be tested first
+            analogWrite(pinIDs[0], 255);
+            analogWrite(pinIDs[1], 255);
+        } else {
+            // Stop motor PH/EN mode - untested, should be correct - may modify
+            analogWrite(pinIDs[1], 0);
+        }
+        state = 0;
+    }
+
+    /**
+     *  @brief Function to set the motor into coast mode. (PWM)
+     */
+    void coast() {
+        if(mode) {
+            analogWrite(pinIDs[0], 0);
+            analogWrite(pinIDs[1], 0);
+        } else {
+            // Stop motor PH/EN mode - untested, should be correct - may modify
+            analogWrite(pinIDs[1], 0);
+        }
+    }
+
+    /**
+     *  @brief Sets a stored default output, used in run_PWM(int direction);
+     *  @param output The integer output to store, either for PWM or PHEN. Clamped: [-255, 255].
+     */
+    void setOutput(int output) {
+        if (output < -255) {
+            this->output = -255;
+        } else if (output > 255) {
+            this->output = 255;
+        } else {
+            this->output = output;
+        }
+    }
+
+    /**
+     *  @return the current draw of the motor, in Amps. Calls analogRead() directly.
+     *  TODO: Test getCurrent()
+     */
+    double getCurrent() {
+        int counts = analogRead(pinIDs[2]);
+        // Convert raw ADC counts to the IPROPI pin voltage
+        double vipropi = ((double) counts) / DacMax * AdcRefVoltage;
+        // VIPROPI = Imotor * AIPROPI * RIPROPI
+        // Rearrange: Imotor = VIPROPI / (RIPROPI * AIPROPI)
+        return vipropi / (Ripropi * Aipropi);
+    }
+
+    /**
+     * Runs the motor to the current required state.
+     * runMotor() must only happen on periodic() so control is gated by the motor's period.
+     */
+    void periodic() {
+        // Restarts the cycle at the end of the period, and begin the request to see a new temperature
+        if (millis() - cycleStartTime >= PERIOD) {
+            runMotor(output);
+            cycleStartTime = millis();
+        }
+    }
+
+private:
+    int *pinIDs;
+    int pin_count_;
+    int output; // Preset output, from 0 to 255
+    bool invert;
+    bool mode;
+    int state = 2; // -1, 0, 1, 2  reverse, brake, forward, coast
+    // The millis() time of the start of the period.
+    // Share for all DRV8874 motors, but use the latest one's period start time in begin()
+    unsigned long cycleStartTime;
+    static double PERIOD = 650; // ms
+
+    // Vref sets the current threshold at which the DRV8874 begins regulating the current
+    double Vref = 3.3;
+    // Reference voltage of the MCU's ADC (Uno Q logic level), used to convert analogRead() counts to volts.
+    double AdcRefVoltage = 3.3;
+    // Current-sense scaling factor inside the DRV8874.
+    // If the motor is drawing 1A, the DRV8874 produces 0.455 mA at its IPROPI output.
+    double Aipropi = 0.455;
+    double Ripropi = 2.49; // On the Pololu DRV8874 carrier, Pololu already installs a 2.49 kΩ resistor.
+    int DacMax = 1024; // ADC resolution (counts) of analogRead()
 
     /** 
      *  @brief method for convenience: converts provided dir and pwm value to pwm control of the motor
@@ -132,18 +222,14 @@ public:
         // TODO: Test actual control of motor, fix if needed.
         if (pwm == 0) 
         {
-            // Coast
-            analogWrite(pinIDs[0], 0);
-            analogWrite(pinIDs[1], 0);
+            coast();
             state = 2;
         }
         else {
             // If goal output is NOT coasting, we need to coast first
             int newState = dir;
             if (state != newState) {
-              // Coast first
-              analogWrite(pinIDs[0], 0);
-              analogWrite(pinIDs[1], 0);
+              coast(); // first
               state = newState;
               return;
             }
@@ -161,22 +247,7 @@ public:
                 analogWrite(pinIDs[0], 0);
                 analogWrite(pinIDs[1], pwm);
             }
-            else
-            {
-                // Brake motor - pwm probably shouldn't be max as that wastes power to heat
-                analogWrite(pinIDs[0], pwm);
-                analogWrite(pinIDs[1], pwm);
-            }
         }
-    }
-
-    /** 
-     *  @brief Runs motor using PWM control; uses stored `output` (as pwm)
-     *  @param direction The direction, either 1, -1, or 0 to run the motor at.
-     */
-    void runPWM(int direction)
-    {
-        runPWM(direction, output);
     }
 
     /** 
@@ -222,83 +293,25 @@ public:
         }
     }
 
-    /** 
-     *  @brief Runs motor using PH/EN control; uses stored `output`
-     *  @param direction The direction, either 1, -1, or 0 to run the motor at.
-     */
-    void runPHEN(int direction)
-    {
-        runPHEN(direction, output);
-    }
 
     /** 
      *  @brief Simple function that checks mode and passes provided dir and output value to control via PWM or PH/EN.
-     *  @param direction Direction of output, 1 is forward, -1 is reverse, 0 is coast
-     *  @param output Magnitude of analog output - 0 min, 255 max
+     *  @param output Aanalog output - 0 min, 255 max, between -255 and -1 is reverse
      */
-    void runMotor(int direction, int output) {
+    void runMotor(int output) {
         if (mode) {
-            runPWM(direction, output);
+            if (output < 0) {
+                runPWM(-1, -output);
+            } else {
+                runPWM(1, output);
+            }
         } else {
-            runPHEN(direction, output);
+            if (output < 0) {
+                runPHEN(-1, -output);
+            } else {
+                runPHEN(1, output);
+            }
         }
     }
-
-    /** 
-     *  @brief Simple function that checks mode and passes provided dir value and pre-set output magnitude to control via PWM or PH/EN.
-     *  @param dir Direction of output, 1 is forward, -1 is reverse, 0 is coast
-     */
-    void runMotor(int direction) {
-        if (mode) {
-            runPWM(direction, output);
-        } else {
-            runPHEN(direction, output);
-        }
-    }
-
-    /**
-     *  @brief Sets a stored default output, used in run_PWM(int direction);
-     *  @param output The integer output to store, either for PWM or PHEN. Clamped: [0, 255].
-     */
-    void setOutput(int output) {
-        if (output < 0) {
-            this->output = 0;
-        } else if (output > 255) {
-            this->output = 255;
-        } else {
-            this->output = output;
-        }
-    }
-
-    /**
-     *  @return the current draw of the motor, in Amps. Calls analogRead() directly.
-     *  TODO: Test getCurrent()
-     */
-    double getCurrent() {
-        int counts = analogRead(pinIDs[2]);
-        // Convert raw ADC counts to the IPROPI pin voltage
-        double vipropi = ((double) counts) / DacMax * AdcRefVoltage;
-        // VIPROPI = Imotor * AIPROPI * RIPROPI
-        // Rearrange: Imotor = VIPROPI / (RIPROPI * AIPROPI)
-        return vipropi / (Ripropi * Aipropi);
-    }
-
-private:
-    int *pinIDs;
-    int pin_count_;
-    int output; // Preset output, from 0 to 255
-    bool invert;
-    bool mode;
-    int state = 2; // -1, 0, 1, 2  reverse, brake, forward, coast
-    
-    // Vref sets the current threshold at which the DRV8874 begins regulating the current
-    double Vref = 3.3;
-    // Reference voltage of the MCU's ADC (Uno Q logic level), used to convert analogRead() counts to volts.
-    double AdcRefVoltage = 3.3;
-    // Current-sense scaling factor inside the DRV8874.
-    // If the motor is drawing 1A, the DRV8874 produces 0.455 mA at its IPROPI output.
-    double Aipropi = 0.455;
-    double Ripropi = 2.49; // On the Pololu DRV8874 carrier, Pololu already installs a 2.49 kΩ resistor.
-    int DacMax = 1024; // ADC resolution (counts) of analogRead()
 };
 #endif // DRV8874_HPP

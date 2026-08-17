@@ -117,8 +117,8 @@ void stopAll() {
   setLed(true);
   currentMode = 0;
   // Coast Motors
-  motorA.runMotor(0, 0);
-  motorB.runMotor(0, 0);
+  motorA.coast();
+  motorB.coast();
   eStopEnabled = true;
 }
 
@@ -133,8 +133,8 @@ void setup() {
   // Begin motors and set a "default" output
   motorA.begin();
   motorB.begin();
-  motorA.setOutput(setpoints[0]);
-  motorB.setOutput(setpoints[1]);
+  motorA.setOutput(0);
+  motorB.setOutput(0);
   pinMode(Constants::LED_PIN, OUTPUT);
   digitalWrite(Constants::LED_PIN, LOW);
   leftThermo.setup();
@@ -182,23 +182,23 @@ void checkButtons() {
   }
 }
 
-/** Applies the state to the motor setpoints and runs motors. Should be called periodically. */
+/** Applies the state to the motor setpoints. Should be called periodically. */
 void updateSetpoints() {
   
   if (leftArmState) {
-    motorA.runMotor(-1, setpoints[0]);
+    motorA.setOutput(-setpoints[0]);
   } else {
-    motorA.runMotor(1, setpoints[0]);
+    motorA.setOutput(setpoints[0]);
   }
   
   if (rightArmState) {
-    motorB.runMotor(-1, setpoints[1]);
+    motorB.setOutput(-setpoints[1]);
   } else {
-    motorB.runMotor(1, setpoints[1]);
+    motorB.setOutput(setpoints[1]);
   }
 
   // TODO: Delete when Uno Q timer code replaces loop()
-  delay(650);
+  delay(20);
 }
 
 void periodic() {
@@ -215,6 +215,8 @@ void periodic() {
   if (!eStopEnabled) {
     updateSetpoints();
   }
+  motorA.periodic();
+  motorB.periodic();
 
 }
 
